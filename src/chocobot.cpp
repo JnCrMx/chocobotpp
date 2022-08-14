@@ -1,8 +1,12 @@
 #include <spdlog/spdlog.h>
+#include <sstream>
 
 #include "chocobot.hpp"
+#include "command.hpp"
 
 namespace chocobot {
+
+command_factory::map_type* command_factory::map = nullptr;
 
 void chocobot::init()
 {
@@ -26,6 +30,37 @@ void chocobot::init()
         spdlog::warn("Database connection (\"{}\") is not open", m_db.m_connection.connection_string());
     }
     m_db.prepare();
+
+    for(auto& [name, cmd] : *command_factory::get_map())
+    {
+        cmd->prepare();
+        spdlog::info("Prepared command {}", name);
+    }
+
+    m_bot.on_message_create([this](const dpp::message_create_t& event){
+        if(event.msg.author.is_bot())
+            return;
+        std::istringstream iss(event.msg.content);
+        std::string command;
+        iss >> command;
+
+        guild guild = m_db.get_guild(event.msg.guild_id);
+        if(!command.starts_with(guild.prefix))
+            return;
+        command = command.substr(guild.prefix.size());
+        if(!command_factory::get_map()->contains(command))
+            return;
+        auto& cmd = command_factory::get_map()->at(command);
+        bool result = cmd->execute(*this, m_bot, guild, event, iss);
+        if(result)
+        {
+            spdlog::info("Command {} from user {} in guild {} succeeded.", command, event.msg.author.format_username(), event.msg.guild_id);
+        }
+        else
+        {
+            spdlog::warn("Command {} from user {} in guild {} failed.", command, event.msg.author.format_username(), event.msg.guild_id);
+        }
+    });
 }
 
 void chocobot::start()

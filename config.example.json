@@ -1,0 +1,4 @@
+{
+    "token": "your-bot-token",
+    "database": "postgres://chocobot@localhost/chocobot"
+}

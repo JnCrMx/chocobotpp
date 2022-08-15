@@ -17,6 +17,14 @@ void database::prepare()
     m_connection.prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
 }
 
+std::string database::prepare(const std::string& name, const std::string& sql)
+{
+    std::string uname = m_connection.adorn_name(name);
+    m_connection.prepare(uname, sql);
+    spdlog::debug("Prepared statement {}: {}", uname, sql);
+    return uname;
+}
+
 void database::create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx)
 {
     tx_helper<void>(tx, [user, guild](pqxx::work& tx){

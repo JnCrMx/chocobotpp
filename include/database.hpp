@@ -28,6 +28,7 @@ namespace chocobot {
             }
 
             void prepare();
+            std::string prepare(const std::string& name, const std::string& sql);
 
             void create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx = nullptr);
 

@@ -33,7 +33,7 @@ void chocobot::init()
 
     for(auto& [name, cmd] : *command_factory::get_map())
     {
-        cmd->prepare();
+        cmd->prepare(*this, m_db);
         spdlog::info("Prepared command {}", name);
     }
 
@@ -51,7 +51,7 @@ void chocobot::init()
         if(!command_factory::get_map()->contains(command))
             return;
         auto& cmd = command_factory::get_map()->at(command);
-        bool result = cmd->execute(*this, m_bot, guild, event, iss);
+        bool result = cmd->execute(*this, m_db, m_bot, guild, event, iss);
         if(result)
         {
             spdlog::info("Command {} from user {} in guild {} succeeded.", command, event.msg.author.format_username(), event.msg.guild_id);

@@ -13,9 +13,9 @@ class chocobot;
 class command
 {
     public:
-        virtual bool execute(chocobot&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
+        virtual bool execute(chocobot&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
         virtual std::string get_name() = 0;
-        virtual void prepare() {}
+        virtual void prepare(chocobot&, database&) {}
         virtual ~command() {}
 };
 

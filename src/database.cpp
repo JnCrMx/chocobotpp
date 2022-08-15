@@ -14,6 +14,7 @@ void database::prepare()
     m_connection.prepare("get_stat", "SELECT value FROM user_stats WHERE uid=$1 AND guild=$2 AND stat=$3");
     m_connection.prepare("set_stat", "INSERT INTO user_stats(uid, guild, stat, value) VALUES($1, $2, $3, $4) ON CONFLICT (uid, guild, stat) DO UPDATE SET value=$4");
     m_connection.prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language FROM guilds WHERE id=$1");
+    m_connection.prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
 }
 
 void database::create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx)

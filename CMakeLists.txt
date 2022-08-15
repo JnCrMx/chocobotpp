@@ -18,6 +18,7 @@ find_package(spdlog REQUIRED)
 set(SOURCES main.cpp
             src/database.cpp
             src/chocobot.cpp
+            src/i18n.cpp
             src/commands/ping.cpp
             src/commands/coins.cpp)
 add_executable(chocobot ${SOURCES})

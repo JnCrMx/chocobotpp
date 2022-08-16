@@ -1,5 +1,7 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <array>
+#include <algorithm>
 
 #include "chocobot.hpp"
 #include "command.hpp"
@@ -66,6 +68,13 @@ void chocobot::init()
         else
         {
             spdlog::warn("Command {} from user {} in guild {} failed.", command, event.msg.author.format_username(), event.msg.guild_id);
+        }
+    });
+    m_bot.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
+        constexpr std::array forbidden_emojis = {"🍞", "🥖"};
+        if(std::find(forbidden_emojis.begin(), forbidden_emojis.end(), event.reacting_emoji.name) != forbidden_emojis.end())
+        {
+            m_bot.message_delete_reaction(event.message_id, event.reacting_channel->id, event.reacting_user.id, event.reacting_emoji.name);
         }
     });
 }

@@ -1,10 +1,15 @@
 #pragma once
 
-#include <dpp/snowflake.h>
-#include <pqxx/pqxx>
-#include <functional>
+#include <deque>
+#include <optional>
 #include <string>
 #include <vector>
+#include <mutex>
+#include <memory>
+#include <condition_variable>
+
+#include <dpp/snowflake.h>
+#include <pqxx/pqxx>
 
 namespace chocobot {
 
@@ -21,54 +26,79 @@ namespace chocobot {
         std::vector<dpp::snowflake> muted_channels{};
     };
 
+    class database;
+    class connection_wrapper
+    {
+        private:
+            database* m_db;
+            std::unique_ptr<pqxx::connection> m_connection;
+        public:
+        connection_wrapper(database* db, std::unique_ptr<pqxx::connection>&& connection) : 
+            m_db(db),
+            m_connection(std::move(connection))
+        {
+        }
+        ~connection_wrapper();
+
+        pqxx::connection& operator*()
+        {
+            return *m_connection.get();
+        }
+    };
+
     class database {
         public:
-            database(const std::string& uri) : m_connection(uri) {
-                m_connection.set_session_var("application_name", "ChocoBot");
+            database(const std::string& uri, unsigned int count = 5) {
+                for(int i=0; i<count; i++)
+                {
+                    std::unique_ptr<pqxx::connection> conn = std::make_unique<pqxx::connection>(uri);
+                    conn->set_session_var("application_name", "ChocoBot #"+std::to_string(i));
+                    m_connections.push_back(std::move(conn));
+                }
+                m_main_connection = m_connections.front().get();
             }
 
             void prepare();
             std::string prepare(const std::string& name, const std::string& sql);
 
-            void create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx = nullptr);
+            template<typename F>
+            static auto work(F consumer, pqxx::connection& connection) -> decltype(consumer(std::declval<pqxx::transaction_base&>()))
+            {
+                pqxx::work work(connection);
+                auto ret = consumer(work);
+                work.commit();
+                return ret;
+            }
 
-            int get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx = nullptr);
-            void change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::work* tx = nullptr);
-            void set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::work* tx = nullptr);
+            template<typename F>
+            static auto work(F consumer, pqxx::connection& connection) -> std::enable_if_t<std::is_same_v<decltype(consumer(std::declval<pqxx::transaction_base&>())), void>, void>
+            {
+                pqxx::work work(connection);
+                consumer(work);
+                work.commit();
+            }
 
-            int get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::work* tx = nullptr);
-            void set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::work* tx = nullptr);
+            void create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx);
 
-            guild get_guild(dpp::snowflake guild, pqxx::work* tx = nullptr);
+            int get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx);
 
-            pqxx::connection m_connection;
+            void change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::transaction_base& tx);
+            void set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::transaction_base& tx);
+
+            int get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx);
+            void set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::transaction_base& tx);
+
+            std::optional<guild> get_guild(dpp::snowflake guild, pqxx::transaction_base& tx);
+
+            connection_wrapper acquire_connection();
+            void return_connection(std::unique_ptr<pqxx::connection>&&);
+
+            pqxx::connection* m_main_connection;
         protected:
-            template<typename T>
-            T tx_helper(pqxx::work* tx, std::function<T(pqxx::work& tx)> consumer)
-            {
-                bool tx_given = tx;
-                if(!tx_given) tx = new pqxx::work{m_connection};
-                T t = consumer(*tx);
-                if(!tx_given)
-                {
-                    tx->commit();
-                    delete tx;
-                }
-                return t;
-            }
+            std::mutex m_lock;
+            std::condition_variable m_signal;
+            std::deque<std::unique_ptr<pqxx::connection>> m_connections{};
 
-            template<>
-            void tx_helper(pqxx::work* tx, std::function<void(pqxx::work& tx)> consumer)
-            {
-                bool tx_given = tx;
-                if(!tx_given) tx = new pqxx::work{m_connection};
-                consumer(*tx);
-                if(!tx_given)
-                {
-                    tx->commit();
-                    delete tx;
-                }
-            }
+            static constexpr auto acquire_timeout = std::chrono::seconds(10);
     };
-
 }

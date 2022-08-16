@@ -18,17 +18,17 @@ class coins_command : public command
             return "coins";
         }
 
-        bool execute(chocobot&, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
+        bool execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
         {
             int coins;
             using system_time = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
             system_time last_daily;
 
-            pqxx::work txn{db.m_connection};
+            pqxx::nontransaction txn{connection};
             auto result = txn.exec_prepared(statement, event.msg.author.id, event.msg.guild_id);
             if(result.empty())
             {
-                db.create_user(event.msg.author.id, event.msg.guild_id);
+                db.create_user(event.msg.author.id, event.msg.guild_id, txn);
                 coins = 0;
                 last_daily = system_time(std::chrono::milliseconds(0));
             }

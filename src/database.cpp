@@ -1,84 +1,110 @@
 #include "database.hpp"
 #include "snowflake.h"
 
+#include <mutex>
+#include <thread>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/chrono.h>
 
 namespace chocobot {
 
 void database::prepare()
 {
-    m_connection.prepare("create_user", "INSERT INTO coins(uid, guild, coins, last_daily, daily_streak) VALUES ($1, $2, 0, 0, 0)");
-    m_connection.prepare("get_coins", "SELECT coins FROM coins WHERE uid=$1 AND guild=$2");
-    m_connection.prepare("change_coins", "UPDATE coins SET coins=coins+$3 WHERE uid=$1 AND guild=$2");
-    m_connection.prepare("set_coins", "UPDATE coins SET coins=$3 WHERE uid=$1 AND guild=$2");
-    m_connection.prepare("get_stat", "SELECT value FROM user_stats WHERE uid=$1 AND guild=$2 AND stat=$3");
-    m_connection.prepare("set_stat", "INSERT INTO user_stats(uid, guild, stat, value) VALUES($1, $2, $3, $4) ON CONFLICT (uid, guild, stat) DO UPDATE SET value=$4");
-    m_connection.prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language FROM guilds WHERE id=$1");
-    m_connection.prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
+    for(auto& conn : m_connections)
+    {
+        conn->prepare("create_user", "INSERT INTO coins(uid, guild, coins, last_daily, daily_streak) VALUES ($1, $2, 0, 0, 0)");
+        conn->prepare("get_coins", "SELECT coins FROM coins WHERE uid=$1 AND guild=$2");
+        conn->prepare("change_coins", "UPDATE coins SET coins=coins+$3 WHERE uid=$1 AND guild=$2");
+        conn->prepare("set_coins", "UPDATE coins SET coins=$3 WHERE uid=$1 AND guild=$2");
+        conn->prepare("get_stat", "SELECT value FROM user_stats WHERE uid=$1 AND guild=$2 AND stat=$3");
+        conn->prepare("set_stat", "INSERT INTO user_stats(uid, guild, stat, value) VALUES($1, $2, $3, $4) ON CONFLICT (uid, guild, stat) DO UPDATE SET value=$4");
+        conn->prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language FROM guilds WHERE id=$1");
+        conn->prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
+    }   
+}
+
+connection_wrapper database::acquire_connection()
+{
+    std::unique_lock<std::mutex> guard(m_lock);
+    while(!m_signal.wait_for(guard, acquire_timeout, [this](){return !m_connections.empty();}))
+    {
+        spdlog::warn("Failed to acquire connection after {}", acquire_timeout);
+    }
+
+    auto conn = std::move(m_connections.front());
+    m_connections.pop_front();
+    
+    spdlog::debug("Acquire connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
+
+    return connection_wrapper(this, std::move(conn));
+}
+
+connection_wrapper::~connection_wrapper()
+{
+    m_db->return_connection(std::move(m_connection));
+}
+
+void database::return_connection(std::unique_ptr<pqxx::connection>&& conn)
+{
+    {
+        std::lock_guard<std::mutex> guard(m_lock);
+        spdlog::debug("Returned connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
+        m_connections.push_back(std::move(conn));
+    }
+    m_signal.notify_one();
 }
 
 std::string database::prepare(const std::string& name, const std::string& sql)
 {
-    std::string uname = m_connection.adorn_name(name);
-    m_connection.prepare(uname, sql);
+    std::string uname = m_main_connection->adorn_name(name);
+    for(auto& conn : m_connections)
+    {
+        conn->prepare(uname, sql);
+    }
     spdlog::debug("Prepared statement {}: {}", uname, sql);
     return uname;
 }
 
-void database::create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx)
+void database::create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx)
 {
-    tx_helper<void>(tx, [user, guild](pqxx::work& tx){
-        tx.exec_prepared0("create_user", user, guild);
-    });
+    tx.exec_prepared0("create_user", user, guild);
     spdlog::debug("Created new user entry for {} in {}.", user, guild);
 }
 
-int database::get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::work* tx)
+int database::get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx)
 {
-    return tx_helper<int>(tx, [user, guild](pqxx::work& tx){
-        return tx.exec_prepared1("get_coins", user, guild).at("coins").as<int>();
-    });
+    return tx.exec_prepared1("get_coins", user, guild).at("coins").as<int>();
 }
 
-void database::change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::work* tx)
+void database::change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::transaction_base& tx)
 {
-    tx_helper<void>(tx, [user, guild, amount](pqxx::work& tx){
-        tx.exec_prepared0("change_coins", user, guild, amount);
-    });
+    tx.exec_prepared0("change_coins", user, guild, amount);
 }
 
-void database::set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::work* tx)
+void database::set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::transaction_base& tx)
 {
-    tx_helper<void>(tx, [user, guild, coins](pqxx::work& tx){
-        tx.exec_prepared0("set_coins", user, guild, coins);
-    });
+    tx.exec_prepared0("set_coins", user, guild, coins);
 }
 
-int database::get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::work* tx)
+int database::get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx)
 {
-    return tx_helper<int>(tx, [user, guild, stat](pqxx::work& tx){
-        return tx.exec_prepared1("get_stat", user, guild, stat).at("value").as<int>();
-    });
+    return tx.exec_prepared1("get_stat", user, guild, stat).at("value").as<int>();
 }
 
-void database::set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::work* tx)
+void database::set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::transaction_base& tx)
 {
-    tx_helper<void>(tx, [user, guild, stat, value](pqxx::work& tx){
-        tx.exec_prepared0("set_stat", user, guild, stat, value);
-    });
+    tx.exec_prepared0("set_stat", user, guild, stat, value);
 }
 
-guild database::get_guild(dpp::snowflake guild, pqxx::work* tx)
+std::optional<guild> database::get_guild(dpp::snowflake guild, pqxx::transaction_base& tx)
 {
-    return tx_helper<struct guild>(tx, [guild](pqxx::work& tx){
-        auto [
-            id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
-        ] = tx.exec_prepared1("get_guild", guild).as<dpp::snowflake, std::string, dpp::snowflake, dpp::snowflake, dpp::snowflake, dpp::snowflake, std::string>();
-        struct guild g{
-            id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
-        };
-        return g;
-    });
+    auto [
+        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
+    ] = tx.exec_prepared1("get_guild", guild).as<dpp::snowflake, std::string, dpp::snowflake, dpp::snowflake, dpp::snowflake, dpp::snowflake, std::string>();
+    struct guild g{
+        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
+    };
+    return g;
 }
 
 }

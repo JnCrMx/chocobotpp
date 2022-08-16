@@ -21,13 +21,13 @@ void chocobot::init()
             case dpp::loglevel::ll_critical: spdlog::critical(log.message); break;
         }
     });
-    if(m_db.m_connection.is_open())
+    if(m_db.m_main_connection->is_open())
     {
         spdlog::info("Connected to database!");
     }
     else
     {
-        spdlog::warn("Database connection (\"{}\") is not open", m_db.m_connection.connection_string());
+        spdlog::warn("Database connection (\"{}\") is not open", m_db.m_main_connection->connection_string());
     }
     m_db.prepare();
 
@@ -44,14 +44,21 @@ void chocobot::init()
         std::string command;
         iss >> command;
 
-        guild guild = m_db.get_guild(event.msg.guild_id);
+        auto connection = m_db.acquire_connection();
+        std::optional<guild> g = database::work(std::bind_front(&database::get_guild, &m_db, event.msg.guild_id), *connection);
+        if(!g)
+            return;
+        guild guild = g.value();
+
         if(!command.starts_with(guild.prefix))
             return;
+
         command = command.substr(guild.prefix.size());
         if(!command_factory::get_map()->contains(command))
             return;
+
         auto& cmd = command_factory::get_map()->at(command);
-        bool result = cmd->execute(*this, m_db, m_bot, guild, event, iss);
+        bool result = cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
         if(result)
         {
             spdlog::info("Command {} from user {} in guild {} succeeded.", command, event.msg.author.format_username(), event.msg.guild_id);

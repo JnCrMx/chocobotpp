@@ -19,9 +19,11 @@ set(SOURCES main.cpp
             src/database.cpp
             src/chocobot.cpp
             src/i18n.cpp
+            src/utils.cpp
             src/commands/ping.cpp
             src/commands/coins.cpp
-            src/commands/ship.cpp)
+            src/commands/ship.cpp
+            src/commands/daily.cpp)
 add_executable(chocobot ${SOURCES})
 
 target_include_directories(chocobot PUBLIC include/)

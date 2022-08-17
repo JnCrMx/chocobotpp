@@ -1,6 +1,7 @@
 #include "command.hpp"
 #include "chocobot.hpp"
 #include "i18n.hpp"
+#include "branding.hpp"
 
 #include <dpp/dpp.h>
 
@@ -18,7 +19,7 @@ class coins_command : public command
             return "coins";
         }
 
-        bool execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
+        result execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
         {
             int coins;
             using system_time = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
@@ -43,16 +44,16 @@ class coins_command : public command
             std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(std::chrono::system_clock::now().time_since_epoch());
 
             dpp::embed embed{};
-            embed.set_title(translate(connection, guild, "command.coins.title"));
-            embed.set_color(dpp::colors::orange);
-            embed.add_field(translate(connection, guild, "command.coins.your"), std::to_string(coins));
+            embed.set_title(i18n::translate(connection, guild, "command.coins.title"));
+            embed.set_color(branding::colors::coins);
+            embed.add_field(i18n::translate(connection, guild, "command.coins.your"), std::to_string(coins));
             if(days < current_days)
             {
-                embed.set_footer(dpp::embed_footer().set_text(translate(connection, guild, "command.coins.daily")));
+                embed.set_footer(dpp::embed_footer().set_text(i18n::translate(connection, guild, "command.coins.daily")));
             }
             event.reply(dpp::message(event.msg.channel_id, embed));
 
-            return true;
+            return command::result::success;
         }
 
         void prepare(chocobot&, database& db) override

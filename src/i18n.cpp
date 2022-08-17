@@ -1,6 +1,6 @@
 #include "i18n.hpp"
 
-namespace chocobot {
+namespace chocobot::i18n {
 
 std::string translate_get(pqxx::connection& db, const guild& guild, const std::string& key)
 {

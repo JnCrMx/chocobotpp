@@ -3,7 +3,7 @@
 #include <fmt/core.h>
 #include "database.hpp"
 
-namespace chocobot {
+namespace chocobot::i18n {
 
 std::string translate_get(pqxx::connection& db, const guild& guild, const std::string& key);
 std::string translate_base(pqxx::connection& db, const guild& guild, const std::string& key);

@@ -48,7 +48,7 @@ namespace chocobot {
 
     class database {
         public:
-            database(const std::string& uri, unsigned int count = 5) {
+            database(const std::string& uri, unsigned int count = 3) {
                 for(int i=0; i<count; i++)
                 {
                     std::unique_ptr<pqxx::connection> conn = std::make_unique<pqxx::connection>(uri);
@@ -71,7 +71,8 @@ namespace chocobot {
             }
 
             template<typename F>
-            static auto work(F consumer, pqxx::connection& connection) -> std::enable_if_t<std::is_same_v<decltype(consumer(std::declval<pqxx::transaction_base&>())), void>, void>
+            static auto work(F consumer, pqxx::connection& connection) -> 
+                std::enable_if_t<std::is_same_v<decltype(consumer(std::declval<pqxx::transaction_base&>())), void>, void>
             {
                 pqxx::work work(connection);
                 consumer(work);

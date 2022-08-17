@@ -44,12 +44,12 @@ class coins_command : public command
             std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(std::chrono::system_clock::now().time_since_epoch());
 
             dpp::embed embed{};
-            embed.set_title(i18n::translate(connection, guild, "command.coins.title"));
+            embed.set_title(i18n::translate(txn, guild, "command.coins.title"));
             embed.set_color(branding::colors::coins);
-            embed.add_field(i18n::translate(connection, guild, "command.coins.your"), std::to_string(coins));
+            embed.add_field(i18n::translate(txn, guild, "command.coins.your"), std::to_string(coins));
             if(days < current_days)
             {
-                embed.set_footer(dpp::embed_footer().set_text(i18n::translate(connection, guild, "command.coins.daily")));
+                embed.set_footer(dpp::embed_footer().set_text(i18n::translate(txn, guild, "command.coins.daily")));
             }
             event.reply(dpp::message(event.msg.channel_id, embed));
 

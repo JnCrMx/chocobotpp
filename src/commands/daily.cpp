@@ -60,14 +60,14 @@ class daily_command : public command
             bool first = result.empty();
 
             dpp::embed embed{};
-            embed.set_title(i18n::translate(connection, guild, "command.daily.title"));
+            embed.set_title(i18n::translate(txn, guild, "command.daily.title"));
             embed.set_color(branding::colors::coins);
 
             std::chrono::days days = std::chrono::duration_cast<std::chrono::days>(last_daily.time_since_epoch());
             std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(now.time_since_epoch());
             if(days >= current_days)
             {
-                event.reply(utils::build_error(connection, guild, "command.daily.error.dup"));
+                event.reply(utils::build_error(txn, guild, "command.daily.error.dup"));
                 return command::result::user_error;
             }
 
@@ -76,7 +76,7 @@ class daily_command : public command
             if(generous_days+std::chrono::days(1) < current_days)
             {
                 daily_streak = 0;
-                embed.set_footer(i18n::translate(connection, guild, "command.daily.streak_lost"), {});
+                embed.set_footer(i18n::translate(txn, guild, "command.daily.streak_lost"), {});
             }
 
             int coins_to_add = get_coins_for_streak(daily_streak) + (first ? first_bonus : 0);
@@ -86,14 +86,14 @@ class daily_command : public command
                 std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
             int coins = db.get_coins(event.msg.author.id, event.msg.guild_id, txn);
 
-            embed.add_field(i18n::translate(connection, guild, "command.daily.your_coins"), std::to_string(coins));
-            embed.add_field(i18n::translate(connection, guild, "command.daily.your_streak"), std::to_string(daily_streak));
+            embed.add_field(i18n::translate(txn, guild, "command.daily.your_coins"), std::to_string(coins));
+            embed.add_field(i18n::translate(txn, guild, "command.daily.your_streak"), std::to_string(daily_streak));
 
             std::ostringstream oss;
-            oss << i18n::translate(connection, guild, "command.daily.message", coins_to_add);
+            oss << i18n::translate(txn, guild, "command.daily.message", coins_to_add);
             if(first)
             {
-                oss << ' ' << i18n::translate(connection, guild, "command.daily.first", first_bonus);
+                oss << ' ' << i18n::translate(txn, guild, "command.daily.first", first_bonus);
             }
             embed.set_description(oss.str());
 

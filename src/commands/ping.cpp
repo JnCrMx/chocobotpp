@@ -14,10 +14,10 @@ class ping_command : public command
             return "ping";
         }
 
-        bool execute(chocobot&, pqxx::connection&, database&, dpp::cluster& discord, const guild&, const dpp::message_create_t& event, std::istream&) override
+        result execute(chocobot&, pqxx::connection&, database&, dpp::cluster& discord, const guild&, const dpp::message_create_t& event, std::istream&) override
         {
             discord.message_create(dpp::message(event.msg.channel_id, "Pong!").set_reference(event.msg.id));
-            return true;
+            return command::result::success;
         }
     private:
         static command_register<ping_command> reg;

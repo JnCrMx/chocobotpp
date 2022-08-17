@@ -60,15 +60,9 @@ void chocobot::init()
             return;
 
         auto& cmd = command_factory::get_map()->at(command);
-        bool result = cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
-        if(result)
-        {
-            spdlog::info("Command {} from user {} in guild {} succeeded.", command, event.msg.author.format_username(), event.msg.guild_id);
-        }
-        else
-        {
-            spdlog::warn("Command {} from user {} in guild {} failed.", command, event.msg.author.format_username(), event.msg.guild_id);
-        }
+        command::result result = cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
+        spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
+            command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);
     });
     m_bot.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
         constexpr std::array forbidden_emojis = {"🍞", "🥖"};

@@ -23,7 +23,7 @@ class ship_command : public command
         static constexpr auto emoji_null =  ":broken_heart:";
         static constexpr auto emoji_full =  ":cupid:";
         
-        bool execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t& event, std::istream& args) override
+        result execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t& event, std::istream& args) override
         {
             std::string word1, word2;
             args >> std::quoted(word1) >> std::quoted(word2);
@@ -57,7 +57,7 @@ class ship_command : public command
 
             event.reply(dpp::message(event.msg.channel_id, embed));
 
-            return true;
+            return command::result::success;
         }
     private:
         static command_register<ship_command> reg;

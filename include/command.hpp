@@ -2,7 +2,9 @@
 
 #include <dpp/dpp.h>
 #include <pqxx/pqxx>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 #include <memory>
 
 #include "database.hpp"
@@ -14,7 +16,35 @@ class chocobot;
 class command
 {
     public:
-        virtual bool execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
+        enum class result
+        {
+            success,
+            user_error,
+            system_error
+        };
+        template<typename OStream>
+        friend OStream &operator<<(OStream& os, const result& r)
+        {
+            switch(r)
+            {
+                case command::result::success:      return os << "success";
+                case command::result::user_error:   return os << "user_error";
+                case command::result::system_error: return os << "system_error";
+            }
+        }
+        static spdlog::level::level_enum result_level(const result& r)
+        {
+            switch(r)
+            {
+                case result::success:
+                case result::user_error:
+                    return spdlog::level::info;
+                case result::system_error:
+                    return spdlog::level::warn;
+            }
+        }
+
+        virtual result execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
         virtual std::string get_name() = 0;
         virtual void prepare(chocobot&, database&) {}
         virtual ~command() {}

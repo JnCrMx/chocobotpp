@@ -5,6 +5,8 @@
 
 #include "chocobot.hpp"
 #include "command.hpp"
+#include "i18n.hpp"
+#include "message.h"
 
 namespace chocobot {
 
@@ -71,6 +73,81 @@ void chocobot::init()
             m_bot.message_delete_reaction(event.message_id, event.reacting_channel->id, event.reacting_user.id, event.reacting_emoji.name);
         }
     });
+
+    remind_queries.list = m_db.prepare("list_reminds", "SELECT * FROM reminders WHERE time <= $1 AND done = false");
+    remind_queries.done = m_db.prepare("remind_done", "UPDATE reminders SET done = true WHERE id = $1");
+    remind_thread = std::jthread([this](std::stop_token stop_token){
+        using namespace std::literals::chrono_literals;
+        std::this_thread::sleep_for(10s);
+        while(!stop_token.stop_requested())
+        {
+            check_reminds();
+            std::this_thread::sleep_for(1min);
+        }
+    });
+}
+
+void chocobot::check_reminds()
+{
+    using system_time = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+    using namespace std::literals::chrono_literals;
+    
+    auto connection = m_db.acquire_connection();
+    pqxx::work txn(*connection);
+
+    auto now = std::chrono::system_clock::now();
+    spdlog::debug("Checking reminds for time {}", now);
+    auto result = txn.exec_prepared(remind_queries.list, std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
+    for(const auto& row : result)
+    {
+        int id = row.at("id").as<int>();
+        dpp::snowflake uid = row.at("uid").as<dpp::snowflake>();
+        dpp::snowflake guild_id = row.at("guild").as<dpp::snowflake>();
+        std::string message = row.at("message").as<std::string>();
+        dpp::snowflake issuer_id = row.at("issuer").as<dpp::snowflake>();
+        system_time time = system_time(std::chrono::milliseconds(row.at("time").as<unsigned long>()));
+        dpp::snowflake channel_id = row.at("channel").as<dpp::snowflake>();
+
+        auto gs = m_db.get_guild(guild_id, txn);
+        if(!gs.has_value()) continue;
+        guild guild = gs.value();
+
+        if(!channel_id) channel_id = guild.remind_channel;
+        if(!channel_id) continue;
+
+        auto user = dpp::find_user(uid);
+        auto issuer = dpp::find_user(issuer_id);
+
+        std::string bot_message;
+        if(uid != issuer_id)
+        {
+            if(message.empty())
+                bot_message = i18n::translate(txn, guild, "reminder.other.plain", user->get_mention(), issuer->format_username());
+            else
+                bot_message = i18n::translate(txn, guild, "reminder.other.message", user->get_mention(), issuer->format_username(), message);
+        }
+        else
+        {
+            if(message.empty())
+                bot_message = i18n::translate(txn, guild, "reminder.self.plain", user->get_mention());
+            else
+                bot_message = i18n::translate(txn, guild, "reminder.self.message", user->get_mention(), message);
+        }
+        if(now - time > 5min)
+        {
+            bot_message += "  ";
+            bot_message += i18n::translate(txn, guild, "reminder.delay", time, (now-time));
+        }
+        dpp::message msg{channel_id, bot_message};
+        if(bot_message.find(user->get_mention()) != std::string::npos)
+            msg.set_allowed_mentions(true, false, false, false, {uid}, {});
+        m_bot.message_create_sync(msg);
+
+        spdlog::debug("Completed remind {} for {} from {} at {}", id, user->format_username(), issuer->format_username(), time);
+
+        txn.exec_prepared0(remind_queries.done, id);
+    }
+    txn.commit();
 }
 
 void chocobot::start()

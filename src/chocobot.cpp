@@ -16,6 +16,8 @@ command_factory::map_type* command_factory::map = nullptr;
 
 void chocobot::init()
 {
+    i18n::init_i18n();
+
     m_bot.on_log([](const dpp::log_t log){
         switch(log.severity)
         {
@@ -117,23 +119,45 @@ void chocobot::check_reminds()
         if(!channel_id) channel_id = guild.remind_channel;
         if(!channel_id) continue;
 
-        auto user = dpp::find_user(uid);
-        auto issuer = dpp::find_user(issuer_id);
+        dpp::user user{};
+        dpp::user issuer{};
+
+        auto userptr = dpp::find_user(uid);
+        if(userptr)
+        {
+            user = *userptr;
+        }
+        else
+        {
+            spdlog::warn("User returned by dpp::find_user for uid {} is null", uid);
+            user = m_bot.user_get_sync(uid);
+        }
+
+        auto issuerptr = dpp::find_user(issuer_id);
+        if(issuerptr)
+        {
+            issuer = *issuerptr;
+        }
+        else
+        {
+            spdlog::warn("User returned by dpp::find_user for issuer_id {} is null", issuer_id);
+            issuer = m_bot.user_get_sync(issuer_id);
+        }
 
         std::string bot_message;
         if(uid != issuer_id)
         {
             if(message.empty())
-                bot_message = i18n::translate(txn, guild, "reminder.other.plain", user->get_mention(), issuer->format_username());
+                bot_message = i18n::translate(txn, guild, "reminder.other.plain", user.get_mention(), issuer.format_username());
             else
-                bot_message = i18n::translate(txn, guild, "reminder.other.message", user->get_mention(), issuer->format_username(), message);
+                bot_message = i18n::translate(txn, guild, "reminder.other.message", user.get_mention(), issuer.format_username(), message);
         }
         else
         {
             if(message.empty())
-                bot_message = i18n::translate(txn, guild, "reminder.self.plain", user->get_mention());
+                bot_message = i18n::translate(txn, guild, "reminder.self.plain", user.get_mention());
             else
-                bot_message = i18n::translate(txn, guild, "reminder.self.message", user->get_mention(), message);
+                bot_message = i18n::translate(txn, guild, "reminder.self.message", user.get_mention(), message);
         }
         if(now - time > 5min)
         {
@@ -143,8 +167,8 @@ void chocobot::check_reminds()
             bot_message += i18n::translate(txn, guild, "reminder.delay", forced_sys, system_time(std::chrono::duration_cast<std::chrono::milliseconds>(now-time)));
         }
         dpp::message msg{channel_id, bot_message};
-        if(bot_message.find(user->get_mention()) != std::string::npos)
-            msg.set_allowed_mentions(true, false, false, false, {uid}, {});
+        /*if(bot_message.find(user->get_mention()) != std::string::npos)
+            msg.set_allowed_mentions(true, false, false, false, {uid}, {});*/
         m_bot.message_create_sync(msg);
 
         spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);

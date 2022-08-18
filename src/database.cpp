@@ -18,7 +18,7 @@ void database::prepare()
         conn->prepare("set_coins", "UPDATE coins SET coins=$3 WHERE uid=$1 AND guild=$2");
         conn->prepare("get_stat", "SELECT value FROM user_stats WHERE uid=$1 AND guild=$2 AND stat=$3");
         conn->prepare("set_stat", "INSERT INTO user_stats(uid, guild, stat, value) VALUES($1, $2, $3, $4) ON CONFLICT (uid, guild, stat) DO UPDATE SET value=$4");
-        conn->prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language FROM guilds WHERE id=$1");
+        conn->prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone FROM guilds WHERE id=$1");
         conn->prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
     }   
 }
@@ -34,7 +34,7 @@ connection_wrapper database::acquire_connection()
     auto conn = std::move(m_connections.front());
     m_connections.pop_front();
     
-    spdlog::debug("Acquire connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
+    spdlog::trace("Acquire connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
 
     return connection_wrapper(this, std::move(conn));
 }
@@ -48,7 +48,7 @@ void database::return_connection(std::unique_ptr<pqxx::connection>&& conn)
 {
     {
         std::lock_guard<std::mutex> guard(m_lock);
-        spdlog::debug("Returned connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
+        spdlog::trace("Returned connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
         m_connections.push_back(std::move(conn));
     }
     m_signal.notify_one();
@@ -99,10 +99,10 @@ void database::set_stat(dpp::snowflake user, dpp::snowflake guild, std::string s
 std::optional<guild> database::get_guild(dpp::snowflake guild, pqxx::transaction_base& tx)
 {
     auto [
-        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
-    ] = tx.exec_prepared1("get_guild", guild).as<dpp::snowflake, std::string, dpp::snowflake, dpp::snowflake, dpp::snowflake, dpp::snowflake, std::string>();
+        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone
+    ] = tx.exec_prepared1("get_guild", guild).as<dpp::snowflake, std::string, dpp::snowflake, dpp::snowflake, dpp::snowflake, dpp::snowflake, std::string, std::string>();
     struct guild g{
-        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language
+        id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone
     };
     return g;
 }

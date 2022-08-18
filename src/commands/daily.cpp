@@ -7,6 +7,8 @@
 
 #include <bits/chrono.h>
 #include <cmath>
+#include <date/date.h>
+#include <date/tz.h>
 #include <dpp/dpp.h>
 #include <ratio>
 
@@ -54,26 +56,28 @@ class daily_command : public command
                 daily_streak = ds;
                 last_daily = system_time(std::chrono::milliseconds(ld));
             }
+            auto last_daily_zoned = date::make_zoned(guild.timezone, last_daily);
 
             auto now = std::chrono::system_clock::now();
-            result = txn.exec_prepared(check_first, event.msg.guild_id, std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
+            auto now_zoned = date::make_zoned(guild.timezone, now);
+
+            auto today = date::make_zoned(guild.timezone, date::floor<date::days>(now_zoned.get_local_time()));
+            result = txn.exec_prepared(check_first, event.msg.guild_id,
+                std::chrono::duration_cast<std::chrono::milliseconds>(today.get_sys_time().time_since_epoch()).count());
             bool first = result.empty();
 
             dpp::embed embed{};
             embed.set_title(i18n::translate(txn, guild, "command.daily.title"));
             embed.set_color(branding::colors::coins);
 
-            std::chrono::days days = std::chrono::duration_cast<std::chrono::days>(last_daily.time_since_epoch());
-            std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(now.time_since_epoch());
+            std::chrono::days days = std::chrono::duration_cast<std::chrono::days>(last_daily_zoned.get_local_time().time_since_epoch());
+            std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(now_zoned.get_local_time().time_since_epoch());
             if(days >= current_days)
             {
                 event.reply(utils::build_error(txn, guild, "command.daily.error.dup"));
                 return command::result::user_error;
             }
-
-            // ease timezone transition
-            std::chrono::days generous_days = std::chrono::duration_cast<std::chrono::days>(last_daily.time_since_epoch() + std::chrono::hours(2));
-            if(generous_days+std::chrono::days(1) < current_days)
+            if(days+std::chrono::days(1) < current_days)
             {
                 daily_streak = 0;
                 embed.set_footer(i18n::translate(txn, guild, "command.daily.streak_lost"), {});

@@ -22,6 +22,7 @@ namespace chocobot {
         dpp::snowflake warning_channel;
         dpp::snowflake poll_channel;
         std::string language;
+        std::string timezone;
         std::vector<dpp::snowflake> operators{};
         std::vector<dpp::snowflake> muted_channels{};
     };

@@ -4,6 +4,8 @@
 #include "branding.hpp"
 
 #include <dpp/dpp.h>
+#include <date/date.h>
+#include <date/tz.h>
 
 namespace chocobot {
 
@@ -39,9 +41,11 @@ class coins_command : public command
                 coins = c;
                 last_daily = system_time(std::chrono::milliseconds(ld));
             }
+            auto last_daily_zoned = date::make_zoned(guild.timezone, last_daily);
+            auto now_zoned = date::make_zoned(guild.timezone, std::chrono::system_clock::now());
 
-            std::chrono::days days = std::chrono::duration_cast<std::chrono::days>(last_daily.time_since_epoch());
-            std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(std::chrono::system_clock::now().time_since_epoch());
+            std::chrono::days days = std::chrono::duration_cast<std::chrono::days>(last_daily_zoned.get_local_time().time_since_epoch());
+            std::chrono::days current_days = std::chrono::duration_cast<std::chrono::days>(now_zoned.get_local_time().time_since_epoch());
 
             dpp::embed embed{};
             embed.set_title(i18n::translate(txn, guild, "command.coins.title"));

@@ -2,6 +2,8 @@
 #include <sstream>
 #include <array>
 #include <algorithm>
+#include <date/date.h>
+#include <date/tz.h>
 
 #include "chocobot.hpp"
 #include "command.hpp"
@@ -135,15 +137,17 @@ void chocobot::check_reminds()
         }
         if(now - time > 5min)
         {
-            bot_message += "  ";
-            bot_message += i18n::translate(txn, guild, "reminder.delay", time, (now-time));
+            bot_message += " ";
+            auto local = date::make_zoned(guild.timezone, time).get_local_time();
+            auto forced_sys = system_time(local.time_since_epoch());
+            bot_message += i18n::translate(txn, guild, "reminder.delay", forced_sys, system_time(std::chrono::duration_cast<std::chrono::milliseconds>(now-time)));
         }
         dpp::message msg{channel_id, bot_message};
         if(bot_message.find(user->get_mention()) != std::string::npos)
             msg.set_allowed_mentions(true, false, false, false, {uid}, {});
         m_bot.message_create_sync(msg);
 
-        spdlog::debug("Completed remind {} for {} from {} at {}", id, user->format_username(), issuer->format_username(), time);
+        spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);
 
         txn.exec_prepared0(remind_queries.done, id);
     }

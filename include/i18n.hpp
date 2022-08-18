@@ -6,6 +6,8 @@
 
 namespace chocobot::i18n {
 
+void init_i18n();
+
 std::string translate_get(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 std::string translate_base(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 

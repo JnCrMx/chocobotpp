@@ -8,7 +8,7 @@
 #include "chocobot.hpp"
 #include "command.hpp"
 #include "i18n.hpp"
-#include "message.h"
+#include "utils.hpp"
 
 namespace chocobot {
 
@@ -119,30 +119,8 @@ void chocobot::check_reminds()
         if(!channel_id) channel_id = guild.remind_channel;
         if(!channel_id) continue;
 
-        dpp::user user{};
-        dpp::user issuer{};
-
-        auto userptr = dpp::find_user(uid);
-        if(userptr)
-        {
-            user = *userptr;
-        }
-        else
-        {
-            spdlog::warn("User returned by dpp::find_user for uid {} is null", uid);
-            user = m_bot.user_get_sync(uid);
-        }
-
-        auto issuerptr = dpp::find_user(issuer_id);
-        if(issuerptr)
-        {
-            issuer = *issuerptr;
-        }
-        else
-        {
-            spdlog::warn("User returned by dpp::find_user for issuer_id {} is null", issuer_id);
-            issuer = m_bot.user_get_sync(issuer_id);
-        }
+        dpp::user user = utils::provide_user(m_bot, uid);
+        dpp::user issuer = utils::provide_user(m_bot, issuer_id);
 
         std::string bot_message;
         if(uid != issuer_id)

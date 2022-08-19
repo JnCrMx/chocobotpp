@@ -3,6 +3,7 @@
 #include "branding.hpp"
 
 #include <dpp/dpp.h>
+#include <spdlog/spdlog.h>
 #include <sstream>
 
 namespace chocobot::utils {
@@ -20,6 +21,14 @@ dpp::message build_error(pqxx::connection& db, const guild& guild, const std::st
 {
     pqxx::nontransaction txn{db};
     return build_error(txn, guild, key);
+}
+
+dpp::user provide_user(dpp::cluster& bot, dpp::snowflake id)
+{
+    auto up = dpp::find_user(id);
+    if(up) return *up;
+    spdlog::warn("User returned by dpp::find_user for id {} is null", id);
+    return bot.user_get_sync(id);
 }
 
 std::optional<dpp::snowflake> parse_mention(const std::string &mention)

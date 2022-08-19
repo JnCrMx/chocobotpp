@@ -82,6 +82,10 @@ command.daily.christmas_save=Ein Weihnachtsengel hat deine Streak gerettet! 👼
 command.daily.christmas_presents=Du hast noch ungeöffnete Weihnachtsgeschenke! 🎁
 command.daily.first=Du bist Erster auf diesem Server und erhältst deshalb einen Bonus von {} @{coins-dat}! 🥳
 
+command.gift.title=Geschenk
+command.gift.message.many={} hat {} {} @{coins} geschenkt.
+command.gift.message.one={} hat {} {} @{coin} geschenkt.
+command.gift.thankyou=Danke! 💝
 command.gift.error.narg=Du musst mir schon sagen wem du wie viele @{coins} schenken möchtest!
 command.gift.error.nan=Ich kann leider nicht verstehen, wie viele @{coins} du verschenken willst.
 command.gift.error.who=Ich kann leider nicht verstehen, wem du @{coins} schenken willst.

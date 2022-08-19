@@ -77,7 +77,7 @@ class remind_command : public command
 			}
 			catch(const std::runtime_error& ex)
 			{
-				discord.message_create(utils::build_error(connection, guild, "command.remind.error.fmt"));
+				event.reply(utils::build_error(connection, guild, "command.remind.error.fmt"));
 				return command::result::user_error;
 			}
 			while(args.peek() == ' ') args.get(); // skip trailing whitespace of message
@@ -89,7 +89,7 @@ class remind_command : public command
 
 			if(time < now)
 			{
-				discord.message_create(utils::build_error(connection, guild, "command.remind.error.past"));
+				event.reply(utils::build_error(connection, guild, "command.remind.error.past"));
 				return command::result::user_error;
 			}
 

@@ -357,7 +357,7 @@ reminder.self.plain={}, ich soll dich erinnern!
 reminder.self.message={}, ich soll dich an "{}" erinnern!
 reminder.other.plain={}, ich soll dich von {} erinnern!
 reminder.other.message={}, ich soll dich von {} an "{}" erinnern!
-reminder.delay=Ich bin leider verspätet! Die Erinnerung sollte eigentlich vor {1:%Hh %Mmin {}sec} {0:am %F um %T} kommen.
+reminder.delay=Ich bin leider verspätet! Die Erinnerung sollte eigentlich vor {1:%Hh %Mmin %Ss} {0:am %F um %T} kommen.
 
 merry-christmas.error.late=Es ist leider schon zu spät dafür. :cry:
 merry-christmas.error.narg=Argumente fehlen:\n?merry-christmas <ID des Empfängers> <Anzahl der @{coins}> [Nachricht]

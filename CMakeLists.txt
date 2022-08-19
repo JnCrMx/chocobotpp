@@ -38,7 +38,7 @@ target_include_directories(chocobot PUBLIC include/)
 target_link_libraries(chocobot PUBLIC dpp pqxx spdlog::spdlog date::date date::date-tz)
 
 set_target_properties(chocobot PROPERTIES
-  CXX_STANDARD 20
+  CXX_STANDARD 23
   CXX_STANDARD_REQUIRED ON
 )
 

@@ -1,5 +1,6 @@
 #include "colors.h"
 #include "command.hpp"
+#include "utils.hpp"
 
 #include <dpp/dpp.h>
 
@@ -33,7 +34,7 @@ class ship_command : public command
             }
 
             dpp::embed embed{};
-            embed.set_title(word1+" x "+word2);
+            embed.set_title(utils::solve_mentions(word1)+" x "+utils::solve_mentions(word2));
             embed.set_color(dpp::colors::magenta);
 
             std::transform(word1.begin(), word1.end(), word1.begin(), [](char a){return (char)std::tolower(a);});

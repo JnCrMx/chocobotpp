@@ -31,7 +31,8 @@ set(SOURCES main.cpp
             src/commands/ping.cpp
             src/commands/coins.cpp
             src/commands/ship.cpp
-            src/commands/daily.cpp)
+            src/commands/daily.cpp
+            src/commands/remind.cpp)
 add_executable(chocobot ${SOURCES})
 
 target_include_directories(chocobot PUBLIC include/)

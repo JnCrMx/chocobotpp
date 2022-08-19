@@ -215,10 +215,10 @@ command.remind.error.fmt=Ich kann deine Zeitangabe leider nicht verstehen!
 command.remind.error.past=Dafür bräuchtest du eine Zeitmaschine!
 command.remind.error.perm=Vergiss es!
 command.remind.error.cost=Du hast nicht genügen @{coins} um diesen Reminder zu bezahlen!
-command.remind.self={}, du wirst {} erinnert!
-command.remind.self.cost={}, du wirst {} erinnert! Da du so oft erinnert werden willst, hat dies dich {} @{coins} gekostet.
-command.remind.other={}, {} wird {} erinnert!
-command.remind.other.cost={}, {} wird {} erinnert! Da du so oft erinnert werden willst, hat dies dich {} @{coins} gekostet.
+command.remind.self=Du wirst {0:am %F um %T} erinnert!
+command.remind.self.cost=Du wirst {0:am %F um %T} erinnert! Da du so oft erinnert werden willst, hat dies dich {} @{coins} gekostet.
+command.remind.other={1} wird {0:am %F um %T} erinnert!
+command.remind.other.cost={1} wird {0:am %F um %T} erinnert! Da du so oft erinnert werden willst, hat dies dich {} @{coins} gekostet.
 
 command.say.error.server=Du bist nicht auf diesem Server!
 command.say.error.channel_perm=Du kannst in diesen Kanal keine Nachrichten senden!

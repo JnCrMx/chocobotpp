@@ -20,7 +20,8 @@ class command
         {
             success,
             user_error,
-            system_error
+            system_error,
+            deferred
         };
         template<typename OStream>
         friend OStream &operator<<(OStream& os, const result& r)
@@ -30,6 +31,7 @@ class command
                 case command::result::success:      return os << "success";
                 case command::result::user_error:   return os << "user_error";
                 case command::result::system_error: return os << "system_error";
+                case command::result::deferred:     return os << "deferred";
             }
         }
         static spdlog::level::level_enum result_level(const result& r)
@@ -38,6 +40,7 @@ class command
             {
                 case result::success:
                 case result::user_error:
+                case result::deferred:
                     return spdlog::level::info;
                 case result::system_error:
                     return spdlog::level::warn;
@@ -78,6 +81,9 @@ struct command_register : command_factory
     }
 
     command_register() : command_register(new T) {}
+
+    template<typename... Args>
+    command_register(Args&&... args) : command_register(new T(std::forward(args...))) {}
 };
 
 };

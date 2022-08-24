@@ -22,4 +22,6 @@ std::string solve_mentions(const std::string& string,
         return std::optional<dpp::user>{};
     });
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to);
+
 }

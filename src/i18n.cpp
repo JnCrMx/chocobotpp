@@ -1,4 +1,5 @@
 #include "i18n.hpp"
+#include "utils.hpp"
 
 #include <map>
 #include <fstream>
@@ -26,6 +27,7 @@ void init_i18n()
             std::string key, value;
             std::getline(iss, key, '=');
             std::getline(iss, value);
+            utils::replaceAll(value, "\\n", "\n");
 
             map[key] = value;
             spdlog::trace("Loaded translation: {} -> \"{}\"", key, value);

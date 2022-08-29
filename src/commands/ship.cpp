@@ -1,4 +1,3 @@
-#include "colors.h"
 #include "command.hpp"
 #include "utils.hpp"
 
@@ -23,6 +22,20 @@ class ship_command : public command
         static constexpr std::array emojis = {":black_heart:", ":heart_decoration:", ":hearts:", ":heart:", ":heartbeat:", ":two_hearts:", ":revolving_hearts:", ":heartpulse:", ":sparkling_heart:", ":gift_heart:"};
         static constexpr auto emoji_null =  ":broken_heart:";
         static constexpr auto emoji_full =  ":cupid:";
+
+        static int ship(std::string word1, std::string word2)
+        {
+            std::transform(word1.begin(), word1.end(), word1.begin(), [](char a){return (char)std::tolower(a);});
+            std::transform(word2.begin(), word2.end(), word2.begin(), [](char a){return (char)std::tolower(a);});
+
+            char a = std::hash<std::string>()(word1);
+            char b = std::hash<std::string>()(word2);
+
+            char r = a ^ b;
+            int percent = (r*100)/std::numeric_limits<char>::max();
+
+            return percent;
+        }
         
         result execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t& event, std::istream& args) override
         {
@@ -37,14 +50,7 @@ class ship_command : public command
             embed.set_title(utils::solve_mentions(word1)+" x "+utils::solve_mentions(word2));
             embed.set_color(dpp::colors::magenta);
 
-            std::transform(word1.begin(), word1.end(), word1.begin(), [](char a){return (char)std::tolower(a);});
-            std::transform(word2.begin(), word2.end(), word2.begin(), [](char a){return (char)std::tolower(a);});
-
-            char a = std::hash<std::string>()(word1);
-            char b = std::hash<std::string>()(word2);
-
-            char r = a ^ b;
-            int percent = (r*100)/std::numeric_limits<char>::max();
+            int percent = ship(word1, word2);
 
             std::ostringstream msg;
             msg << std::quoted(word1) << " x " << std::quoted(word2) << ": " << percent << "%";

@@ -15,11 +15,15 @@ FetchContent_Declare(date
   GIT_REPOSITORY https://github.com/HowardHinnant/date.git
   GIT_TAG        v3.0.1
 )
+FetchContent_Declare(Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.0.1
+)
 
 set(BUILD_TZ_LIB ON CACHE INTERNAL BOOL "build/install of TZ library")
 set(USE_SYSTEM_TZ_DB ON CACHE INTERNAL BOOL "Use the operating system's timezone database")
 
-FetchContent_MakeAvailable(DPP pqxx date)
+FetchContent_MakeAvailable(DPP pqxx date Catch2)
 
 find_package(spdlog REQUIRED)
 
@@ -51,3 +55,5 @@ add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
 add_dependencies(chocobot copy_assets)
+
+add_subdirectory(test)

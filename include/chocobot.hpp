@@ -20,8 +20,10 @@ class chocobot
         {
             init();
         }
+        ~chocobot() = default;
 
         void start();
+        void stop();
     private:
         void init();
 

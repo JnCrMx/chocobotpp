@@ -83,11 +83,14 @@ void chocobot::init()
     remind_thread = std::jthread([this](std::stop_token stop_token){
         using namespace std::literals::chrono_literals;
         std::this_thread::sleep_for(10s);
-        while(!stop_token.stop_requested())
+
+        std::mutex mutex;
+		std::unique_lock<std::mutex> lock(mutex);
+        do
         {
             check_reminds();
-            std::this_thread::sleep_for(1min);
         }
+		while(!std::condition_variable_any().wait_for(lock, stop_token, 1min, [&stop_token]{return stop_token.stop_requested();}));
     });
 }
 
@@ -159,6 +162,11 @@ void chocobot::check_reminds()
 void chocobot::start()
 {
     m_bot.start(dpp::st_wait);
+}
+
+void chocobot::stop()
+{
+    m_bot.shutdown();
 }
 
 }

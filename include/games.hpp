@@ -66,7 +66,6 @@ class game
         virtual void confirm()
         {
             spdlog::debug("Confirming game {} by user {} in guild {}", get_name(), m_host.format_username(), m_guild.id);
-            std::unique_lock<std::mutex> guard(m_lock);
 
             m_state = game_state::confirm;
             if(m_no_confirm)
@@ -95,9 +94,14 @@ class game
                 m_signal.notify_all();
             });
             m_discord.message_add_reaction(m_confirm_message, "✅");
-            bool confirmed = m_signal.wait_for(guard, 10s, [this](){
-                return m_state != game_state::confirm;
-            });
+
+            bool confirmed;
+            {
+                std::unique_lock<std::mutex> guard(m_lock);
+                confirmed = m_signal.wait_for(guard, 10s, [this](){
+                    return m_state != game_state::confirm;
+                });
+            }
             m_discord.on_message_reaction_add.detach(m_reaction_handle);
             m_discord.message_delete(m_confirm_message.id, m_confirm_message.channel_id);
             if(confirmed)

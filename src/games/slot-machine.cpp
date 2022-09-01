@@ -77,8 +77,8 @@ class slot_machine : public single_player_game
         {
             auto w = build_wheels(wheels);
             return i18n::translate(txn, m_guild, key, m_host.format_username(),
-                w[0][0], w[1][0], w[2][0], 
-                w[0][1], w[1][1], w[2][1], 
+                w[0][0], w[1][0], w[2][0],
+                w[0][1], w[1][1], w[2][1],
                 w[0][2], w[1][2], w[2][2],
                 prize);
         }
@@ -100,7 +100,7 @@ class slot_machine : public single_player_game
             auto w0 = emoji_wheel[wheels[0]]; auto c0 = get_category(w0);
             auto w1 = emoji_wheel[wheels[1]]; auto c1 = get_category(w1);
             auto w2 = emoji_wheel[wheels[2]]; auto c2 = get_category(w2);
-            
+
             if(w0 == w1 && w0 == w2)
             {
                 return prize_three * special(c0);

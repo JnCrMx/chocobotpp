@@ -13,6 +13,7 @@ struct config
         token(j["token"]),
         db_uri(j["database"])
     {}
+    config() = default;
 };
 
 }

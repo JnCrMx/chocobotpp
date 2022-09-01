@@ -17,13 +17,15 @@ int main(int argc, const char** argv)
 
     spdlog::info("Starting ChocoBot...");
 
-    nlohmann::json j;
+    chocobot::config config{};
     {
-        std::ifstream ifconfig(argv[1]);
-        ifconfig >> j;
+        nlohmann::json j;
+        {
+            std::ifstream ifconfig(argv[1]);
+            ifconfig >> j;
+        }
+        config = {j};
     }
-
-    chocobot::config config(j);
     chocobot::chocobot bot(config);
     bot.start();
 

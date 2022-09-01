@@ -13,6 +13,8 @@ int main(int argc, const char** argv)
         return 2;
     }
 
+    signal(SIGINT, [](int sig){std::exit(0);});
+
     spdlog::info("Starting ChocoBot...");
 
     nlohmann::json j;

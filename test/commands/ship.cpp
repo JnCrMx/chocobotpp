@@ -6,7 +6,7 @@ namespace chocobot
     class ship_command /* incomplete class is okay for using only static methods it seems */
     {
         public:
-        static int ship(std::string word1, std::string word2);
+        static unsigned int ship(std::string word1, std::string word2);
     };
 }
 

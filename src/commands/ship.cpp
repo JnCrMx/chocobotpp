@@ -23,19 +23,7 @@ class ship_command : public command
         static constexpr auto emoji_null =  ":broken_heart:";
         static constexpr auto emoji_full =  ":cupid:";
 
-        static int ship(std::string word1, std::string word2)
-        {
-            std::transform(word1.begin(), word1.end(), word1.begin(), [](char a){return (char)std::tolower(a);});
-            std::transform(word2.begin(), word2.end(), word2.begin(), [](char a){return (char)std::tolower(a);});
-
-            char a = std::hash<std::string>()(word1);
-            char b = std::hash<std::string>()(word2);
-
-            char r = a ^ b;
-            int percent = (r*100)/std::numeric_limits<char>::max();
-
-            return percent;
-        }
+        static unsigned int ship(std::string word1, std::string word2);
         
         result execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t& event, std::istream& args) override
         {
@@ -70,5 +58,19 @@ class ship_command : public command
         static command_register<ship_command> reg;
 };
 command_register<ship_command> ship_command::reg{};
+
+unsigned int ship_command::ship(std::string word1, std::string word2)
+{
+    std::transform(word1.begin(), word1.end(), word1.begin(), [](char a){return (char)std::tolower(a);});
+    std::transform(word2.begin(), word2.end(), word2.begin(), [](char a){return (char)std::tolower(a);});
+
+    unsigned char a = std::hash<std::string>()(word1);
+    unsigned char b = std::hash<std::string>()(word2);
+
+    unsigned char r = a ^ b;
+    int percent = (r*100)/std::numeric_limits<unsigned char>::max();
+
+    return percent;
+}
 
 }

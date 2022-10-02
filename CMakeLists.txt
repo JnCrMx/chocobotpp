@@ -5,11 +5,11 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.15
+  GIT_TAG        v10.0.19
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
-  GIT_TAG        7.7.3
+  GIT_TAG        7.7.4
 )
 FetchContent_Declare(date
   GIT_REPOSITORY https://github.com/HowardHinnant/date.git
@@ -17,7 +17,7 @@ FetchContent_Declare(date
 )
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.0.1
+  GIT_TAG        v3.1.0
 )
 
 set(BUILD_TZ_LIB ON CACHE INTERNAL BOOL "build/install of TZ library")
@@ -49,7 +49,8 @@ set_target_properties(chocobot PROPERTIES
   CXX_STANDARD_REQUIRED ON
 )
 
-target_link_libraries(chocobot PRIVATE -fsanitize=address)
+#target_compile_options(chocobot PRIVATE -fsanitize=address)
+#target_link_libraries(chocobot PRIVATE -fsanitize=address)
 
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources

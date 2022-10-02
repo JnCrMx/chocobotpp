@@ -11,6 +11,30 @@
 #include <dpp/snowflake.h>
 #include <pqxx/pqxx>
 
+namespace pqxx
+{
+    template<> struct nullness<dpp::snowflake> : no_null<dpp::snowflake> {};
+    template<> struct string_traits<dpp::snowflake>
+    {
+        static dpp::snowflake from_string(std::string_view text)
+        {
+            return dpp::snowflake{string_traits<uint64_t>::from_string(text)};
+        }
+        static zview to_buf(char *begin, char *end, dpp::snowflake const &value)
+        {
+            return string_traits<uint64_t>::to_buf(begin, end, value);
+        }
+        static char *into_buf(char *begin, char *end, dpp::snowflake const &value)
+        {
+            return string_traits<uint64_t>::into_buf(begin, end, value);
+        }
+        static size_t size_buffer(dpp::snowflake const &value) noexcept
+        {
+            return string_traits<uint64_t>::size_buffer(value);
+        }
+    };
+}
+
 namespace chocobot {
 
     struct guild

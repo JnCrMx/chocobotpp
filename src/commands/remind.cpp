@@ -85,7 +85,7 @@ class remind_command : public command
 			auto zoned = date::make_zoned(guild.timezone, time);
 
 			std::string message(std::istreambuf_iterator<char>(args), {});
-			spdlog::debug("{} wants to remind {} at {} with message \"{}\"", event.msg.author.id, user, zoned, message);
+			//spdlog::debug("{} wants to remind {} at {} with message \"{}\"", event.msg.author.id, user, zoned, message);
 
 			if(time < now)
 			{

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dpp/dpp.h>
+#include <fmt/format.h>
 #include <pqxx/pqxx>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -23,6 +24,7 @@ class command
             system_error,
             deferred
         };
+
         template<typename OStream>
         friend OStream &operator<<(OStream& os, const result& r)
         {
@@ -86,4 +88,21 @@ struct command_register : command_factory
     command_register(Args&&... args) : command_register(new T(std::forward(args...))) {}
 };
 
+};
+
+template<> struct fmt::formatter<chocobot::command::result> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    auto format(chocobot::command::result r, FormatContext& ctx) const
+    {
+        std::string_view s = "unknown";
+        switch(r)
+        {
+            case chocobot::command::result::success:      s = "success"; break;
+            case chocobot::command::result::user_error:   s = "user_error"; break;
+            case chocobot::command::result::system_error: s = "system_error"; break;
+            case chocobot::command::result::deferred:     s = "deferred"; break;
+        }
+        return formatter<string_view>::format(s, ctx);
+    }
 };

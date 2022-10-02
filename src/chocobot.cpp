@@ -71,10 +71,11 @@ void chocobot::init()
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);
     });
     m_bot.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
-        constexpr std::array forbidden_emojis = {"🍞", "🥖"};
-        if(std::find(forbidden_emojis.begin(), forbidden_emojis.end(), event.reacting_emoji.name) != forbidden_emojis.end())
+        constexpr std::array forbidden_emojis = {"🍞", "🥖", "🧀"};
+        if(std::find(forbidden_emojis.begin(), forbidden_emojis.end(), event.reacting_emoji.name) != forbidden_emojis.end() 
+            || event.reacting_user.id == 520964577316569088ul)
         {
-            m_bot.message_delete_reaction(event.message_id, event.reacting_channel->id, event.reacting_user.id, event.reacting_emoji.name);
+            m_bot.message_delete_reaction(event.message_id, event.reacting_channel->id, event.reacting_user.id, event.reacting_emoji.format());
         }
     });
 

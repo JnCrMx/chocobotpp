@@ -5,8 +5,25 @@
 #include <dpp/dpp.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <cstdlib>
 
 namespace chocobot::utils {
+
+std::string find_exists(const std::vector<std::optional<std::string>>& paths)
+{
+    for(auto p : paths)
+    {
+        if(p && std::filesystem::exists(*p))
+            return *p;
+    }
+    throw std::runtime_error("not found");
+}
+
+std::optional<std::string> get_env(const std::string& key)
+{
+    char * val = getenv( key.c_str() );
+    return val == NULL ? std::optional<std::string>{} : std::string(val);
+}
 
 dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
 {

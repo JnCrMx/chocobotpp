@@ -7,6 +7,9 @@
 
 namespace chocobot::utils {
 
+std::string find_exists(const std::vector<std::optional<std::string>>& paths);
+std::optional<std::string> get_env(const std::string& key);
+
 dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 dpp::message build_error(pqxx::connection& db, const guild& guild, const std::string& key);
 

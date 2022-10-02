@@ -20,8 +20,8 @@ FetchContent_Declare(Catch2
   GIT_TAG        v3.1.0
 )
 
-set(BUILD_TZ_LIB ON CACHE INTERNAL BOOL "build/install of TZ library")
-set(USE_SYSTEM_TZ_DB ON CACHE INTERNAL BOOL "Use the operating system's timezone database")
+set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)
+set(USE_SYSTEM_TZ_DB ON CACHE BOOL "Use the operating system's timezone database" FORCE)
 
 FetchContent_MakeAvailable(DPP pqxx date Catch2)
 
@@ -49,12 +49,12 @@ set_target_properties(chocobot PROPERTIES
   CXX_STANDARD_REQUIRED ON
 )
 
-#target_compile_options(chocobot PRIVATE -fsanitize=address)
-#target_link_libraries(chocobot PRIVATE -fsanitize=address)
-
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
 add_dependencies(chocobot copy_assets)
+
+install(TARGETS chocobot DESTINATION bin)
+install(DIRECTORY resources DESTINATION share/chocobot)
 
 add_subdirectory(test)

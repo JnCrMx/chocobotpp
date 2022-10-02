@@ -7,15 +7,43 @@
 
 namespace chocobot::i18n {
 
+constexpr std::array RESOURCE_CANDIDATES = {"./resources", "/usr/local/share/chocobot/resources", "/usr/share/chocobot/resources"};
+constexpr auto ENV_RESOURCES = "CHOCOBOT_RESOURCES_PATH";
+constexpr auto ENV_ROOT = "CHOCOBOT_ROOT";
+
+static std::string find_resource_root()
+{
+    std::vector paths = {utils::get_env(ENV_RESOURCES), utils::get_env(ENV_ROOT).transform([](std::string s){return s+"/resources";})};
+    paths.insert(paths.end(), RESOURCE_CANDIDATES.begin(), RESOURCE_CANDIDATES.end());
+    try
+    {
+        return utils::find_exists(paths);
+    }
+    catch(const std::runtime_error&)
+    {
+        spdlog::error("Failed to locate resource directory");
+        for(const auto& p : paths)
+        {
+            if(p)
+            {
+                spdlog::debug("Tried path: {}", *p);
+            }
+        }
+        throw;
+    }
+}
+
 std::map<std::string, std::map<std::string, std::string>> translations;
 void init_i18n()
 {
-    std::ifstream langs("resources/languages.txt");
+    std::string root = find_resource_root();
+
+    std::ifstream langs(root+"/languages.txt");
     std::string lang;
     while(std::getline(langs, lang))
     {
         auto& map = translations[lang];
-        std::ifstream trans("resources/lang/"+lang+".lang");
+        std::ifstream trans(root+"/lang/"+lang+".lang");
 
         std::string line;
         while(std::getline(trans, line, '\n'))

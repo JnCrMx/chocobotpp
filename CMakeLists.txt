@@ -22,8 +22,17 @@ FetchContent_Declare(Catch2
 
 set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "Use the operating system's timezone database" FORCE)
+set(SKIP_BUILD_TEST ON CACHE BOOL "Skips the test option for subprojects" FORCE)
 
-FetchContent_MakeAvailable(DPP pqxx date Catch2)
+option(BUILD_TEST "Build the tests" OFF)
+if(NOT BUILD_TEST)
+  set(DPP_BUILD_TEST OFF CACHE BOOL "Build the test program" FORCE)
+endif(NOT BUILD_TEST)
+
+FetchContent_MakeAvailable(DPP pqxx date)
+if(BUILD_TEST)
+  FetchContent_MakeAvailable(Catch2)
+endif(BUILD_TEST)
 
 find_package(spdlog REQUIRED)
 
@@ -57,4 +66,6 @@ add_dependencies(chocobot copy_assets)
 install(TARGETS chocobot DESTINATION bin)
 install(DIRECTORY resources DESTINATION share/chocobot)
 
-add_subdirectory(test)
+if(BUILD_TEST)
+  add_subdirectory(test)
+endif(BUILD_TEST)

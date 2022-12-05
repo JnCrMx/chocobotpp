@@ -1,0 +1,17 @@
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: docker  
+  image: plugins/docker
+  settings:
+    username: jcm
+    password:
+      from_secret: docker_password
+    repo: git.jcm.re/jcm/chocobot
+    registry: git.jcm.re

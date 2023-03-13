@@ -101,13 +101,19 @@ void chocobot::check_reminds()
     using namespace std::literals::chrono_literals;
     
     auto connection = m_db.acquire_connection();
-    pqxx::work txn(*connection);
 
     auto now = std::chrono::system_clock::now();
     spdlog::debug("Checking reminds for time {}", now);
-    auto result = txn.exec_prepared(remind_queries.list, std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
+    
+    pqxx::result result;
+    {
+        pqxx::nontransaction txn(*connection);
+        result = txn.exec_prepared(remind_queries.list, std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
+    }
+
     for(const auto& row : result)
     {
+        pqxx::work txn(*connection);
         int id = row.at("id").as<int>();
         dpp::snowflake uid = row.at("uid").as<dpp::snowflake>();
         dpp::snowflake guild_id = row.at("guild").as<dpp::snowflake>();
@@ -156,8 +162,8 @@ void chocobot::check_reminds()
         spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);
 
         txn.exec_prepared0(remind_queries.done, id);
+        txn.commit();
     }
-    txn.commit();
 }
 
 void chocobot::start()

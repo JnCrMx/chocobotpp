@@ -1,4 +1,5 @@
 {
     "token": "your-bot-token",
-    "database": "postgres://chocobot@localhost/chocobot"
+    "database": "postgres://chocobot@localhost/chocobot",
+    "bugreport": "sendmail -S ... -f chocobot-bugreport@... ...@..."
 }

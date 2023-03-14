@@ -24,6 +24,8 @@ class chocobot
 
         void start();
         void stop();
+
+        const config& cfg() { return m_config; }
     private:
         void init();
 

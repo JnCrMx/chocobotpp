@@ -28,7 +28,7 @@ class credits_command : public command
                 utils::provide_user(discord, branding::ChocoKeks).format_username());
             eb.add_field(i18n::translate(conn, guild, "command.credits.event"), "Weihnachten 2019");
             eb.add_field(i18n::translate(conn, guild, "command.credits.version"), std::string{git::Describe()});
-            event.reply(dpp::message{event.msg.channel_id, eb});
+            event.reply(dpp::message{dpp::snowflake{}, eb});
 
             return result::success;
         }

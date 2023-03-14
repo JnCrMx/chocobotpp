@@ -152,6 +152,7 @@ command.christmas.message={} schenkt dir {} @{coins}!
 command.credits.title=Credits
 command.credits.dedication=für
 command.credits.event=zu
+command.credits.version=Version
 
 command.gif.error.noent=Ich konnte leider kein passendes GIF finden.
 

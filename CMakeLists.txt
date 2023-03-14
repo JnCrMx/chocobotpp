@@ -19,6 +19,10 @@ FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.1.0
 )
+FetchContent_Declare(cmake_git_version_tracking                   
+  GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
+  GIT_TAG 904dbda1336ba4b9a1415a68d5f203f576b696bb
+)
 
 set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "Use the operating system's timezone database" FORCE)
@@ -29,7 +33,7 @@ if(NOT BUILD_TEST)
   set(DPP_BUILD_TEST OFF CACHE BOOL "Build the test program" FORCE)
 endif(NOT BUILD_TEST)
 
-FetchContent_MakeAvailable(DPP pqxx date)
+FetchContent_MakeAvailable(DPP pqxx date cmake_git_version_tracking)
 if(BUILD_TEST)
   FetchContent_MakeAvailable(Catch2)
 endif(BUILD_TEST)
@@ -49,11 +53,12 @@ set(SOURCES main.cpp
             src/commands/gift.cpp
             src/commands/noop.cpp
             src/commands/random.cpp
+            src/commands/credits.cpp
             src/games/slot-machine.cpp)
 add_executable(chocobot ${SOURCES})
 
 target_include_directories(chocobot PUBLIC include/)
-target_link_libraries(chocobot PUBLIC dpp pqxx spdlog::spdlog date::date date::date-tz)
+target_link_libraries(chocobot PUBLIC dpp pqxx spdlog::spdlog date::date date::date-tz cmake_git_version_tracking)
 
 set_target_properties(chocobot PROPERTIES
   CXX_STANDARD 23

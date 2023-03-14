@@ -1,6 +1,7 @@
 #pragma once
 
-#include "colors.h"
+#include <cstdint>
+
 namespace chocobot::branding {
     namespace colors {
         constexpr uint32_t
@@ -11,4 +12,5 @@ namespace chocobot::branding {
             warn   = 255 << 16 |  50 << 8 |   0,
             game   = 0   << 16 | 255 << 8 | 229;
     }
+    constexpr uint64_t ChocoKeks = 443141932714033192UL;
 }

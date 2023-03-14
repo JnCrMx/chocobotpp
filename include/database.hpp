@@ -6,6 +6,7 @@
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <set>
 #include <condition_variable>
 
 #include <dpp/snowflake.h>
@@ -47,8 +48,8 @@ namespace chocobot {
         dpp::snowflake poll_channel;
         std::string language;
         std::string timezone;
-        std::vector<dpp::snowflake> operators{};
-        std::vector<dpp::snowflake> muted_channels{};
+        std::set<dpp::snowflake> operators{};
+        std::set<dpp::snowflake> muted_channels{};
     };
 
     class database;

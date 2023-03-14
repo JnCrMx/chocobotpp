@@ -47,6 +47,8 @@ set(SOURCES main.cpp
             src/commands/daily.cpp
             src/commands/remind.cpp
             src/commands/gift.cpp
+            src/commands/noop.cpp
+            src/commands/random.cpp
             src/games/slot-machine.cpp)
 add_executable(chocobot ${SOURCES})
 

@@ -98,7 +98,7 @@ class random_command : public command
                     return std::nullopt;
             };
             auto a = to_int(arg1);
-            auto b = to_int(arg1);
+            auto b = to_int(arg2);
             if(a && b)
             {
                 std::uniform_int_distribution<int> dist(*a, *b);

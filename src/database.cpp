@@ -86,9 +86,14 @@ void database::set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, p
     tx.exec_prepared0("set_coins", user, guild, coins);
 }
 
-int database::get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx)
+std::optional<int> database::get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx)
 {
-    return tx.exec_prepared1("get_stat", user, guild, stat).at("value").as<int>();
+    auto res = tx.exec_prepared("get_stat", user, guild, stat);
+    if(res.empty())
+    {
+        return std::nullopt;
+    }
+    return res.front().at("value").as<int>();
 }
 
 void database::set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::transaction_base& tx)

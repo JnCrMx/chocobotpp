@@ -112,7 +112,7 @@ namespace chocobot {
             void change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::transaction_base& tx);
             void set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::transaction_base& tx);
 
-            int get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx);
+            std::optional<int> get_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, pqxx::transaction_base& tx);
             void set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::transaction_base& tx);
 
             std::optional<guild> get_guild(dpp::snowflake guild, pqxx::transaction_base& tx);

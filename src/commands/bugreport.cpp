@@ -24,6 +24,14 @@ class bugreport_command : public command
             dpp::cluster& discord, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
+            // skip space
+            args.get();
+            if(!args.good())
+            {
+                event.reply(utils::build_error(conn, guild, "command.bugreport.error.general"));
+                return result::user_error;
+            }
+
             std::string subject;
             std::getline(args, subject);
 

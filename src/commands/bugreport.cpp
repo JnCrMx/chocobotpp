@@ -4,9 +4,10 @@
 #include "i18n.hpp"
 #include "branding.hpp"
 
+#ifdef __unix__
 #include <ext/stdio_filebuf.h>
-
 #include <sys/wait.h>
+#endif
 
 namespace chocobot {
 
@@ -43,6 +44,7 @@ class bugreport_command : public command
 
             std::string body{std::istreambuf_iterator<char>(args), {}};
 
+#ifdef __unix__
             struct sigaction sa_new{}, sa_old{};
             sa_new.sa_handler = SIG_DFL;
             sigemptyset(&sa_new.sa_mask);
@@ -98,8 +100,10 @@ class bugreport_command : public command
                 thread.detach();
                 return result::deferred;
             }
-
-            return result::success;
+#else
+            event.reply(utils::build_error(conn, guild, "command.bugreport.error.general"));
+            return result::system_error;
+#endif
         }
     private:
         static command_register<bugreport_command> reg;

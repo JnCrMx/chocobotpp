@@ -16,7 +16,7 @@ class ping_command : public command
 
         result execute(chocobot&, pqxx::connection&, database&, dpp::cluster& discord, const guild&, const dpp::message_create_t& event, std::istream&) override
         {
-            discord.message_create(dpp::message(event.msg.channel_id, "Pong!").set_reference(event.msg.id));
+            event.reply("Pong in "+std::to_string((int)(discord.rest_ping*1000.0))+" ms!");
             return command::result::success;
         }
     private:

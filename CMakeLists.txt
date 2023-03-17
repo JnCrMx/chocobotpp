@@ -39,6 +39,7 @@ if(BUILD_TEST)
 endif(BUILD_TEST)
 
 find_package(spdlog REQUIRED)
+find_package(ImageMagick COMPONENTS Magick++ MagickCore REQUIRED)
 
 set(SOURCES main.cpp
             src/database.cpp
@@ -57,11 +58,23 @@ set(SOURCES main.cpp
             src/commands/bugreport.cpp
             src/commands/help.cpp
             src/commands/mystats.cpp
-            src/games/slot-machine.cpp)
+            src/games/slot-machine.cpp
+            src/games/who-is-it.cpp)
 add_executable(chocobot ${SOURCES})
 
 target_include_directories(chocobot PUBLIC include/)
-target_link_libraries(chocobot PUBLIC dpp pqxx spdlog::spdlog date::date date::date-tz cmake_git_version_tracking)
+
+target_include_directories(chocobot PUBLIC
+  ${ImageMagick_INCLUDE_DIRS}
+)
+target_link_libraries(chocobot PUBLIC
+  dpp pqxx spdlog::spdlog
+  ${ImageMagick_LIBRARIES}
+  date::date date::date-tz
+  cmake_git_version_tracking
+)
+target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
+target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )
 
 set_target_properties(chocobot PROPERTIES
   CXX_STANDARD 23

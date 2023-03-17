@@ -1,5 +1,5 @@
 FROM docker.io/alpine:latest
-RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev spdlog-dev openssl-dev postgresql14-dev
+RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev spdlog-dev openssl-dev postgresql14-dev imagemagick-dev
 
 COPY . /src
 RUN mkdir -p /build
@@ -11,6 +11,6 @@ RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/libdpp-config.cmake 
 RUN /usr/bin/cmake --install /build --prefix "/install"
 
 FROM docker.io/alpine:latest
-RUN apk add --no-cache libstdc++ postgresql14 spdlog
+RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick-c++
 COPY --from=0 /install /usr
 CMD ["chocobot"]

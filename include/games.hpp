@@ -185,7 +185,76 @@ class single_player_game : public game
         void announce() override
         {
             m_state = game_state::running;
-            play();
+            try
+            {
+                play();
+            }
+            catch(const std::exception& ex)
+            {
+                spdlog::error("Game {} hosted by {} failed with exception: {}", get_name(), m_host.id, ex.what());
+            }
+            cleanup();
+        }
+};
+
+class multi_player_game : public game
+{
+    private:
+        dpp::event_handle m_reaction_add_handle, m_reaction_remove_handle;
+        dpp::message m_announce_message;
+    protected:
+        std::map<dpp::snowflake, dpp::user> m_players;
+    public:
+        using game::game;
+        virtual void play() = 0;
+
+        void announce() override
+        {
+            m_state = game_state::announce;
+            m_players.emplace(m_host.id, m_host);
+
+            dpp::embed embed{};
+            {
+                connection_wrapper conn = m_db.acquire_connection();
+                pqxx::nontransaction txn{*conn};
+                embed.set_color(branding::colors::game);
+                embed.set_title(i18n::translate(txn, m_guild, "game.announce.title"));
+                embed.set_description(i18n::translate(txn, m_guild, "game.announce.description", get_name()));
+                embed.set_footer(i18n::translate(txn, m_guild, "game.announce.footer"), "");
+            }
+
+            m_announce_message = m_discord.message_create_sync(dpp::message(m_channel, embed));
+            m_reaction_add_handle = m_discord.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
+                if(event.message_id != m_announce_message.id) return;
+                if(event.reacting_emoji.name != "✅") return;
+
+                std::unique_lock<std::mutex> guard(m_lock);
+                m_players.emplace(event.reacting_user.id, event.reacting_user);
+            });
+            m_reaction_remove_handle = m_discord.on_message_reaction_remove([this](const dpp::message_reaction_remove_t& event){
+                if(event.message_id != m_announce_message.id) return;
+                if(event.reacting_emoji.name != "✅") return;
+
+                std::unique_lock<std::mutex> guard(m_lock);
+                m_players.erase(event.reacting_user_id);
+            });
+            m_discord.message_add_reaction(m_announce_message, "✅");
+
+            std::this_thread::sleep_for(10s);
+
+            m_discord.on_message_reaction_add.detach(m_reaction_add_handle);
+            m_discord.on_message_reaction_remove.detach(m_reaction_remove_handle);
+            m_discord.message_delete(m_announce_message.id, m_announce_message.channel_id);
+
+            m_state = game_state::running;
+            try
+            {
+                play();
+            }
+            catch(const std::exception& ex)
+            {
+                spdlog::error("Game {} hosted by {} failed with exception: {}", get_name(), m_host.id, ex.what());
+            }
             cleanup();
         }
 };

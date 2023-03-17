@@ -6,7 +6,7 @@ RUN mkdir -p /build
 RUN /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
     -S/src -B/build -G Ninja
-RUN /usr/bin/cmake --build /build --config RelWithDebInfo --target all --parallel 2 --
+RUN /usr/bin/cmake --build /build --config RelWithDebInfo --target all --parallel $(($(nproc) / 2)) --
 RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/libdpp-config.cmake /src/cmake
 RUN /usr/bin/cmake --install /build --prefix "/install"
 

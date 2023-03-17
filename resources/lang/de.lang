@@ -291,6 +291,7 @@ subscription.sublist.footer=Nutze ?unsubscribe um Schlüsselwörter zu deabonnie
 subscription.message=Das von dir abonnierte Schlüsselwort "{}" wurde erwähnt:\nhttps://discordapp.com/channels/{}/{}/{}
 
 game.error.not_enough=Du hast dafür nicht genug @{coins}! Du brauchst mindestens {} @{coins}.
+game.error.failure=Es trat ein Fehler auf. Deine Kosten von {} @{coins} werden rückerstattet.
 game.confirm.title=Bestätigen?
 game.confirm.description=Wenn du wirklich fortfahren willst, reagiere mit :white_check_mark:!
 game.confirm.cost.key=Preis

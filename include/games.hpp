@@ -150,6 +150,23 @@ class game
             m_thread.detach();
             delete this;
         }
+
+        virtual void error()
+        {
+            connection_wrapper conn = m_db.acquire_connection();
+            pqxx::work txn(*conn);
+
+            dpp::embed embed{};
+            embed.set_title(i18n::translate(txn, m_guild, "error"));
+            embed.set_color(branding::colors::error);
+            embed.set_description(i18n::translate(txn, m_guild, "game.error.failure", get_cost()));
+            embed.set_author(m_host.format_username(), "", m_host.get_avatar_url());
+
+            m_discord.message_create(dpp::message{m_channel, embed});
+
+            m_db.change_coins(m_host.id, m_guild.id, get_cost(), txn);
+            txn.commit();
+        }
     private:
         std::thread m_thread;
 
@@ -192,6 +209,7 @@ class single_player_game : public game
             catch(const std::exception& ex)
             {
                 spdlog::error("Game {} hosted by {} failed with exception: {}", get_name(), m_host.id, ex.what());
+                error();
             }
             cleanup();
         }
@@ -254,6 +272,7 @@ class multi_player_game : public game
             catch(const std::exception& ex)
             {
                 spdlog::error("Game {} hosted by {} failed with exception: {}", get_name(), m_host.id, ex.what());
+                error();
             }
             cleanup();
         }

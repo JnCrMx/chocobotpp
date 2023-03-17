@@ -11,6 +11,6 @@ RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/libdpp-config.cmake 
 RUN /usr/bin/cmake --install /build --prefix "/install"
 
 FROM docker.io/alpine:latest
-RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick-c++
+RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick imagemagick-c++
 COPY --from=0 /install /usr
 CMD ["chocobot"]

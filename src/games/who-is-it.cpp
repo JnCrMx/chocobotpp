@@ -20,7 +20,7 @@ class who_is_it : public multi_player_game
 
         int get_cost() override
         {
-            return 10;
+            return 100;
         }
 
         static constexpr int default_avatar_size = 256;

@@ -151,7 +151,7 @@ command.christmas.bot_message=Fröhliche Weihnacht vom ChocoBot!
 command.christmas.title=Fröhliche Weihnachten!
 command.christmas.message={} schenkt dir {} @{coins}!
 
-command.credits.title=Credits
+command.credits.title={}
 command.credits.dedication=für
 command.credits.event=zu
 command.credits.version=Version

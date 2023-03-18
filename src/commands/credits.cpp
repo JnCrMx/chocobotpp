@@ -22,7 +22,9 @@ class credits_command : public command
             const dpp::message_create_t& event, std::istream& args) override
         {
             dpp::embed eb{};
-            eb.set_title(i18n::translate(conn, guild, "command.credits.title"));
+            eb.set_title(i18n::translate(conn, guild, "command.credits.title", branding::application_name));
+            eb.set_url(branding::project_home);
+            eb.set_author(branding::author_name, branding::author_url, branding::author_icon);
             eb.set_color(branding::colors::cookie);
             eb.add_field(i18n::translate(conn, guild, "command.credits.dedication"),
                 utils::provide_user(discord, branding::ChocoKeks).format_username());

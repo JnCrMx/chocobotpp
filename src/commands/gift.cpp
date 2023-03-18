@@ -41,7 +41,7 @@ class gift_command : public command
 				return command::result::user_error;
 			}
 
-			auto recv = utils::provide_user(discord, recvo.value());
+			auto recv = discord.user_get_cached_sync(recvo.value());
 			{
 				pqxx::work txn(connection);
 				if(db.get_coins(event.msg.author.id, guild.id, txn) < amount)

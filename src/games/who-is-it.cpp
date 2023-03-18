@@ -29,7 +29,7 @@ class who_is_it : public multi_player_game
             std::string avatar_url = member.get_avatar_url(size);
             if(!avatar_url.empty()) return avatar_url;
 
-            dpp::user user = utils::provide_user(m_discord, member.user_id);
+            dpp::user user = m_discord.user_get_cached_sync(member.user_id);
             if(!user.avatar.to_string().empty()) return user.get_avatar_url(size);
 
             return std::nullopt;
@@ -130,7 +130,7 @@ class who_is_it : public multi_player_game
             while(!optional_avatar_url.has_value());
 
             std::string avatar_url = optional_avatar_url.value();
-            m_target_user = utils::provide_user(m_discord, m_target_member.user_id);
+            m_target_user = m_discord.user_get_cached_sync(m_target_member.user_id);
 
             std::promise<std::string> avatar_promise{};
             m_discord.request(avatar_url, dpp::http_method::m_get, [&avatar_promise](const dpp::http_request_completion_t& event){

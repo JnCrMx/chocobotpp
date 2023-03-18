@@ -5,7 +5,7 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.19
+  GIT_TAG        v10.0.23
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
@@ -21,7 +21,7 @@ FetchContent_Declare(Catch2
 )
 FetchContent_Declare(cmake_git_version_tracking                   
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
-  GIT_TAG 904dbda1336ba4b9a1415a68d5f203f576b696bb
+  GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
 )
 
 set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)

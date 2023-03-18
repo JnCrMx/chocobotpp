@@ -13,8 +13,6 @@ std::optional<std::string> get_env(const std::string& key);
 dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 dpp::message build_error(pqxx::connection& db, const guild& guild, const std::string& key);
 
-dpp::user provide_user(dpp::cluster& bot, dpp::snowflake id);
-
 std::optional<dpp::snowflake> parse_mention(const std::string& mention);
 std::string solve_mentions(const std::string& string, 
     std::function<std::string(const dpp::user&)> to_string = &dpp::user::format_username,

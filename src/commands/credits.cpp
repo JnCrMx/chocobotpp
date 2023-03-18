@@ -27,7 +27,7 @@ class credits_command : public command
             eb.set_author(branding::author_name, branding::author_url, branding::author_icon);
             eb.set_color(branding::colors::cookie);
             eb.add_field(i18n::translate(conn, guild, "command.credits.dedication"),
-                utils::provide_user(discord, branding::ChocoKeks).format_username());
+                discord.user_get_cached_sync(branding::ChocoKeks).format_username());
             eb.add_field(i18n::translate(conn, guild, "command.credits.event"), "Weihnachten 2019");
             eb.add_field(i18n::translate(conn, guild, "command.credits.version"), std::string{git::Describe()});
             event.reply(dpp::message{dpp::snowflake{}, eb});

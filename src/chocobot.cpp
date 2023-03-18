@@ -121,8 +121,8 @@ void chocobot::check_reminds()
         if(!channel_id) channel_id = guild.remind_channel;
         if(!channel_id) continue;
 
-        dpp::user user = utils::provide_user(m_bot, uid);
-        dpp::user issuer = utils::provide_user(m_bot, issuer_id);
+        dpp::user user = m_bot.user_get_cached_sync(uid);
+        dpp::user issuer = m_bot.user_get_cached_sync(issuer_id);
 
         std::string bot_message;
         if(uid != issuer_id)

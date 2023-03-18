@@ -109,7 +109,7 @@ class remind_command : public command
 			}
 			else
 			{
-				dpp::user u = utils::provide_user(discord, user);
+				dpp::user u = discord.user_get_cached_sync(user);
 				event.reply(dpp::message{dpp::snowflake{}, i18n::translate(connection, guild, "command.remind.other", forced_sys, u.format_username())});
 			}
 

@@ -29,7 +29,7 @@ class bugreport_command : public command
             args.get();
             if(!args.good())
             {
-                event.reply(utils::build_error(conn, guild, "command.bugreport.error.general"));
+                event.reply(utils::build_error(conn, guild, "command.bugreport.error.empty"));
                 return result::user_error;
             }
 
@@ -38,7 +38,7 @@ class bugreport_command : public command
 
             if(subject.empty())
             {
-                event.reply(utils::build_error(conn, guild, "command.bugreport.error.general"));
+                event.reply(utils::build_error(conn, guild, "command.bugreport.error.empty"));
                 return result::user_error;
             }
 
@@ -101,7 +101,7 @@ class bugreport_command : public command
                 return result::deferred;
             }
 #else
-            event.reply(utils::build_error(conn, guild, "command.bugreport.error.general"));
+            event.reply(utils::build_error(conn, guild, "command.bugreport.error.unsupported"));
             return result::system_error;
 #endif
         }

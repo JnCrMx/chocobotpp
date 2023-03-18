@@ -8,7 +8,6 @@
 #include "chocobot.hpp"
 #include "command.hpp"
 #include "i18n.hpp"
-#include "utils.hpp"
 
 namespace chocobot {
 

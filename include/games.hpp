@@ -12,6 +12,7 @@
 #include <mutex>
 #include <vector>
 #include <chrono>
+#include <experimental/type_traits>
 #include <spdlog/spdlog.h>
 
 #ifdef __unix__
@@ -191,6 +192,16 @@ class game_command : public command
             g->start();
             return command::result::deferred;
         }
+
+        template<typename T>
+        using prepare_t = decltype( T::prepare(std::declval<chocobot&>(), std::declval<database&>()) );
+        void prepare(chocobot& bot, database& db) override
+        {
+            if constexpr (std::experimental::is_detected_v<prepare_t, Game>)
+            {
+                Game::prepare(bot, db);
+            }
+        }
 };
 
 class single_player_game : public game
@@ -245,6 +256,7 @@ class multi_player_game : public game
             m_reaction_add_handle = m_discord.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
                 if(event.message_id != m_announce_message.id) return;
                 if(event.reacting_emoji.name != "✅") return;
+                if(event.reacting_user.is_bot()) return;
 
                 std::unique_lock<std::mutex> guard(m_lock);
                 m_players.emplace(event.reacting_user.id, event.reacting_user);

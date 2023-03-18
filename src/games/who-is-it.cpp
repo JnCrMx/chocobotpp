@@ -23,6 +23,7 @@ class who_is_it : public multi_player_game
             return 100;
         }
 
+    private:
         static constexpr int default_avatar_size = 256;
         std::optional<std::string> find_avatar_url(const dpp::guild_member& member, int size = default_avatar_size)
         {
@@ -102,12 +103,13 @@ class who_is_it : public multi_player_game
         static constexpr int base_reward = 150;
         static constexpr int additional_reward = 15;
 
+    public:
         void play() override
         {
             auto members = m_discord.guild_get_members_sync(m_guild.id, 1000, dpp::snowflake{});
 
-            std::random_device hwrng;
-            std::default_random_engine engine(hwrng());
+            static std::random_device hwrng;
+            static std::default_random_engine engine(hwrng());
             std::uniform_int_distribution<int> dist(0, members.size()-1);
 
             std::optional<std::string> optional_avatar_url;
@@ -153,7 +155,7 @@ class who_is_it : public multi_player_game
             Magick::Image avatar{};
             avatar.read(avatar_blob);
 
-            std::uniform_int_distribution<int> gif_type_dist(0, gif_generators.size()-1);
+            static std::uniform_int_distribution<int> gif_type_dist(0, gif_generators.size()-1);
             int generator = gif_type_dist(engine);
             Magick::Blob gif = gif_generators[generator](avatar);
 

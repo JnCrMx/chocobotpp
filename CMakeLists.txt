@@ -59,7 +59,8 @@ set(SOURCES main.cpp
             src/commands/help.cpp
             src/commands/mystats.cpp
             src/games/slot-machine.cpp
-            src/games/who-is-it.cpp)
+            src/games/who-is-it.cpp
+            src/games/quiz.cpp)
 add_executable(chocobot ${SOURCES})
 
 target_include_directories(chocobot PUBLIC include/)

@@ -37,6 +37,7 @@ std::map<std::string, std::map<std::string, std::string>> translations;
 void init_i18n()
 {
     std::string root = find_resource_root();
+    resource_root = root;
 
     std::ifstream langs(root+"/languages.txt");
     std::string lang;

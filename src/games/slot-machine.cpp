@@ -28,6 +28,7 @@ class slot_machine : public single_player_game
             return 10;
         }
 
+    private:
         constexpr static std::array emoji_fruits  = {"🍎", "🍋", "🍉", "🍓", "🍈", "🍒", "🍍"};
         constexpr static std::array emoji_hearts  = {"❤️", "🧡", "💛", "💚", "💙", "💜", "🖤"};
         constexpr static std::array emoji_money   = {"💸", "💵", "💴", "💶", "💷", "💰", "💳"};
@@ -131,11 +132,12 @@ class slot_machine : public single_player_game
             }
         }
 
+    public:
         void play() override
         {
-            std::random_device hwrng;
-            std::default_random_engine engine(hwrng());
-            std::uniform_int_distribution<int> dist(0, 2);
+            static std::random_device hwrng;
+            static std::default_random_engine engine(hwrng());
+            static std::uniform_int_distribution<int> dist(0, 2);
             std::array<int, 3> wheels{dist(engine), dist(engine), dist(engine)};
 
             dpp::message msg;

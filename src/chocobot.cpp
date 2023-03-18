@@ -70,14 +70,6 @@ void chocobot::init()
         spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);
     });
-    m_bot.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
-        constexpr std::array forbidden_emojis = {"🍞", "🥖", "🧀"};
-        if(std::find(forbidden_emojis.begin(), forbidden_emojis.end(), event.reacting_emoji.name) != forbidden_emojis.end() 
-            || event.reacting_user.id == 520964577316569088ul)
-        {
-            m_bot.message_delete_reaction(event.message_id, event.reacting_channel->id, event.reacting_user.id, event.reacting_emoji.format());
-        }
-    });
 
     remind_queries.list = m_db.prepare("list_reminds", "SELECT * FROM reminders WHERE time <= $1 AND done = false");
     remind_queries.done = m_db.prepare("remind_done", "UPDATE reminders SET done = true WHERE id = $1");

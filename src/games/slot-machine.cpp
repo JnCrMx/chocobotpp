@@ -23,9 +23,10 @@ class slot_machine : public single_player_game
             return std::string(name);
         }
 
+        constexpr static int cost = 10;
         int get_cost() override
         {
-            return 10;
+            return cost;
         }
 
     private:

@@ -74,7 +74,7 @@ namespace chocobot {
 
     class database {
         public:
-            database(const std::string& uri, unsigned int count = 3) {
+            database(const std::string& uri, unsigned int count = default_connection_count) {
                 for(int i=0; i<count; i++)
                 {
                     std::unique_ptr<pqxx::connection> conn = std::make_unique<pqxx::connection>(uri);
@@ -107,7 +107,7 @@ namespace chocobot {
 
             void create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx);
 
-            int get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx);
+            std::optional<int> get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx);
 
             void change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::transaction_base& tx);
             void set_coins(dpp::snowflake user, dpp::snowflake guild, int coins, pqxx::transaction_base& tx);
@@ -127,5 +127,6 @@ namespace chocobot {
             std::deque<std::unique_ptr<pqxx::connection>> m_connections{};
 
             static constexpr auto acquire_timeout = std::chrono::seconds(10);
+            static constexpr auto default_connection_count = 10;
     };
 }

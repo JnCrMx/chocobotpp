@@ -5,6 +5,7 @@
 #include "branding.hpp"
 #include "i18n.hpp"
 #include "command.hpp"
+#include "utils.hpp"
 
 #include <condition_variable>
 #include <dpp/dpp.h>
@@ -186,8 +187,22 @@ class game_command : public command
             return std::string(Game::name);
         }
 
-        result execute(chocobot& bot, pqxx::connection&, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
+        result execute(chocobot& bot, pqxx::connection& conn, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
         {
+            {
+                pqxx::nontransaction txn{conn};
+                if(db.get_coins(event.msg.author.id, guild.id, txn).value_or(0) < Game::cost)
+                {
+                    dpp::embed embed{};
+                    embed.set_title(i18n::translate(txn, guild, "error"));
+                    embed.set_color(branding::colors::error);
+                    embed.set_description(i18n::translate(txn, guild, "game.error.not_enough", Game::cost));
+                    event.reply(dpp::message{dpp::snowflake{}, embed});
+
+                    return command::result::user_error;
+                }
+            }
+            
             Game* g = new Game(bot, db, discord, event.msg.author, guild, event.msg.channel_id);
             g->start();
             return command::result::deferred;

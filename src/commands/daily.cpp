@@ -88,7 +88,7 @@ class daily_command : public command
 
             txn.exec_prepared0(update_coins, event.msg.author.id, event.msg.guild_id, coins_to_add, daily_streak,
                 std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
-            int coins = db.get_coins(event.msg.author.id, event.msg.guild_id, txn);
+            int coins = db.get_coins(event.msg.author.id, event.msg.guild_id, txn).value_or(0);
 
             embed.add_field(i18n::translate(txn, guild, "command.daily.your_coins"), std::to_string(coins));
             embed.add_field(i18n::translate(txn, guild, "command.daily.your_streak"), std::to_string(daily_streak));

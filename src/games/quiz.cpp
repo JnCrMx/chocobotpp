@@ -18,9 +18,10 @@ class quiz : public multi_player_game
             return std::string(name);
         }
 
+        constexpr static int cost = 100;
         int get_cost() override
         {
-            return 100;
+            return cost;
         }
 
     private:

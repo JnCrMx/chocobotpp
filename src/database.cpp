@@ -71,9 +71,14 @@ void database::create_user(dpp::snowflake user, dpp::snowflake guild, pqxx::tran
     spdlog::debug("Created new user entry for {} in {}.", user, guild);
 }
 
-int database::get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx)
+std::optional<int> database::get_coins(dpp::snowflake user, dpp::snowflake guild, pqxx::transaction_base& tx)
 {
-    return tx.exec_prepared1("get_coins", user, guild).at("coins").as<int>();
+    auto res = tx.exec_prepared("get_coins", user, guild);
+    if(res.empty())
+    {
+        return std::nullopt;
+    }
+    return res.front().at("coins").as<int>();
 }
 
 void database::change_coins(dpp::snowflake user, dpp::snowflake guild, int amount, pqxx::transaction_base& tx)

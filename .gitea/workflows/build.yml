@@ -19,5 +19,6 @@ jobs:
     - name: build image
       uses: https://github.com/docker/build-push-action@v4
       with:
+        context: .
         push: true
         tags: git.jcm.re/jcm/chocobot:latest

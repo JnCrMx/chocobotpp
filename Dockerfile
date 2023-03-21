@@ -2,6 +2,7 @@ FROM docker.io/alpine:latest
 RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev spdlog-dev openssl-dev postgresql14-dev imagemagick-dev
 
 COPY . /src
+RUN ls -la /src
 RUN mkdir -p /build
 RUN /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \

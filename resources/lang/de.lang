@@ -222,6 +222,7 @@ command.remind.error.fmt=Ich kann deine Zeitangabe leider nicht verstehen!
 command.remind.error.past=Dafür bräuchtest du eine Zeitmaschine!
 command.remind.error.perm=Vergiss es!
 command.remind.error.cost=Du hast nicht genügen @{coins} um diesen Reminder zu bezahlen!
+command.remind.error.noent=Ich konnte diesen Nutzer leider nicht finden.
 command.remind.self=Du wirst {0:am %F um %T} erinnert!
 command.remind.self.cost=Du wirst {0:am %F um %T} erinnert! Da du so oft erinnert werden willst, hat dies dich {} @{coins} gekostet.
 command.remind.other={1} wird {0:am %F um %T} erinnert!

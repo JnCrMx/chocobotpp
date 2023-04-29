@@ -59,6 +59,20 @@ class remind_command : public command
 			auto snowflake = utils::parse_mention(first);
 			dpp::snowflake user = snowflake.value_or(event.msg.author.id);
 
+			dpp::user other_user;
+			if(user != event.msg.author.id)
+			{
+				try
+				{
+					other_user = discord.user_get_cached_sync(user);
+				}
+				catch(const dpp::rest_exception& ex)
+				{
+					event.reply(utils::build_error(connection, guild, "command.remind.error.noent"));
+					return command::result::user_error;
+				}
+			}
+
 			date::local_time<std::chrono::milliseconds> time;
 			date::local_time<std::chrono::milliseconds> now = date::make_zoned(guild.timezone, date::floor<std::chrono::milliseconds>(std::chrono::system_clock::now())).get_local_time();
 
@@ -109,8 +123,7 @@ class remind_command : public command
 			}
 			else
 			{
-				dpp::user u = discord.user_get_cached_sync(user);
-				event.reply(dpp::message{dpp::snowflake{}, i18n::translate(connection, guild, "command.remind.other", forced_sys, u.format_username())});
+				event.reply(dpp::message{dpp::snowflake{}, i18n::translate(connection, guild, "command.remind.other", forced_sys, other_user.format_username())});
 			}
 
 			return result::success;

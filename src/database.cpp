@@ -1,10 +1,10 @@
 #include "database.hpp"
-#include "snowflake.h"
 
 #include <mutex>
 #include <thread>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/chrono.h>
+#include <dpp/snowflake.h>
 
 namespace chocobot {
 

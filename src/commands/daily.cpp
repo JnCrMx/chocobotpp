@@ -1,7 +1,6 @@
 #include "command.hpp"
 #include "chocobot.hpp"
 #include "i18n.hpp"
-#include "message.h"
 #include "utils.hpp"
 #include "branding.hpp"
 

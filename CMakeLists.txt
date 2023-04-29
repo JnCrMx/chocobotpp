@@ -23,6 +23,7 @@ FetchContent_Declare(cmake_git_version_tracking
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
   GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
 )
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 
 set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "Use the operating system's timezone database" FORCE)
@@ -33,10 +34,28 @@ if(NOT BUILD_TEST)
   set(DPP_BUILD_TEST OFF CACHE BOOL "Build the test program" FORCE)
 endif(NOT BUILD_TEST)
 
-FetchContent_MakeAvailable(DPP pqxx date cmake_git_version_tracking)
+option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
+option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
+ 
+FetchContent_MakeAvailable(date cmake_git_version_tracking)
 if(BUILD_TEST)
   FetchContent_MakeAvailable(Catch2)
 endif(BUILD_TEST)
+
+if(USE_INSTALLED_DPP)
+  find_package(dpp REQUIRED)
+  FetchContent_MakeAvailable(json)
+else()
+  FetchContent_MakeAvailable(DPP)
+  add_library(dpp::dpp ALIAS dpp)
+endif(USE_INSTALLED_DPP)
+
+if(USE_INSTALLED_PQXX)
+  find_package(libpqxx REQUIRED)
+else()
+  FetchContent_MakeAvailable(pqxx)
+  add_library(libpqxx::pqxx ALIAS pqxx)
+endif(USE_INSTALLED_PQXX)
 
 find_package(spdlog REQUIRED)
 find_package(ImageMagick COMPONENTS Magick++ MagickCore REQUIRED)
@@ -69,13 +88,19 @@ target_include_directories(chocobot PUBLIC
   ${ImageMagick_INCLUDE_DIRS}
 )
 target_link_libraries(chocobot PUBLIC
-  dpp pqxx spdlog::spdlog
+  dpp::dpp libpqxx::pqxx spdlog::spdlog
   ${ImageMagick_LIBRARIES}
   date::date date::date-tz
   cmake_git_version_tracking
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )
+
+if(USE_INSTALLED_DPP) # DPP doesn't properly export include directories nor libraries
+  target_include_directories(chocobot PUBLIC ${dpp_DIR}/../../../include)
+  target_link_libraries(chocobot PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(chocobot PUBLIC crypto ssl)
+endif(USE_INSTALLED_DPP)
 
 set_target_properties(chocobot PROPERTIES
   CXX_STANDARD 23

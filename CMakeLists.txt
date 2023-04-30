@@ -25,14 +25,16 @@ FetchContent_Declare(cmake_git_version_tracking
 )
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 
-set(BUILD_TZ_LIB ON CACHE BOOL "build/install of TZ library" FORCE)
-set(USE_SYSTEM_TZ_DB ON CACHE BOOL "Use the operating system's timezone database" FORCE)
+set(BUILD_TZ_LIB ON CACHE BOOL "date: build/install of TZ library" FORCE)
+set(USE_SYSTEM_TZ_DB ON CACHE BOOL "date: Use the operating system's timezone database" FORCE)
 set(SKIP_BUILD_TEST ON CACHE BOOL "Skips the test option for subprojects" FORCE)
 
 option(BUILD_TEST "Build the tests" OFF)
 if(NOT BUILD_TEST)
-  set(DPP_BUILD_TEST OFF CACHE BOOL "Build the test program" FORCE)
+  set(DPP_BUILD_TEST OFF CACHE BOOL "DPP: Build the test program" FORCE)
 endif(NOT BUILD_TEST)
+set(BUILD_VOICE_SUPPORT OFF CACHE BOOL "DPP: Build voice support" FORCE)
+set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
 
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
@@ -80,7 +82,16 @@ set(SOURCES main.cpp
             src/games/slot-machine.cpp
             src/games/who-is-it.cpp
             src/games/quiz.cpp)
+set(HEADERS "include/chocobot.hpp"
+            "include/database.hpp"
+            "include/command.hpp"
+            "include/games.hpp"
+            "include/i18n.hpp"
+            "include/utils.hpp"
+            "include/branding.hpp"
+            "include/config.hpp")
 add_executable(chocobot ${SOURCES})
+target_precompile_headers(chocobot PRIVATE ${HEADERS})
 
 target_include_directories(chocobot PUBLIC include/)
 

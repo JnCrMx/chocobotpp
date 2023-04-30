@@ -4,25 +4,14 @@ RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev z
 ARG DPP_VERSION=v10.0.23
 ARG PQXX_VERSION=7.7.4
 
-RUN mkdir -p /third_party/dpp/src
-ADD https://github.com/brainboxdotcc/DPP/archive/refs/tags/${DPP_VERSION}.tar.gz /third_party/dpp.tar.gz
-RUN tar -C /third_party/dpp/src -xaf /third_party/dpp.tar.gz --strip-components=1 && \
-    /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-    -DBUILD_SHARED_LIBS=OFF -DDPP_BUILD_TEST=OFF \
-    -S/third_party/dpp/src -B/third_party/dpp/build -G Ninja && \
-    /usr/bin/cmake --build /third_party/dpp/build --config RelWithDebInfo --target all --parallel $(($(nproc) / 2)) -- && \
-    /usr/bin/cmake --install /third_party/dpp/build --prefix "/third_party/dpp/install"
+RUN mkdir -p /third_party/dpp/install
+# Download prebuilt DPP
+ADD https://files.jcm.re/dpp-${DPP_VERSION}.tar.gz /third_party/dpp.tar.gz
+RUN tar -C /third_party/dpp/install -xaf /third_party/dpp.tar.gz
 
-RUN mkdir -p /third_party/pqxx/src
-ADD https://github.com/jtv/libpqxx/archive/refs/tags/${PQXX_VERSION}.tar.gz /third_party/pqxx.tar.gz
-RUN tar -C /third_party/pqxx/src -xaf /third_party/pqxx.tar.gz --strip-components=1 && \
-    /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-    -DSKIP_BUILD_TEST=ON -DBUILD_TEST=OFF \
-    -S/third_party/pqxx/src -B/third_party/pqxx/build -G Ninja && \
-    /usr/bin/cmake --build /third_party/pqxx/build --config RelWithDebInfo --target all --parallel $(($(nproc) / 2)) -- && \
-    /usr/bin/cmake --install /third_party/pqxx/build --prefix "/third_party/pqxx/install"
+RUN mkdir -p /third_party/pqxx/install
+ADD https://files.jcm.re/libpqxx-${PQXX_VERSION}.tar.gz /third_party/pqxx.tar.gz
+RUN tar -C /third_party/pqxx/install -xaf /third_party/pqxx.tar.gz
 
 COPY . /src
 RUN mkdir -p /build

@@ -7,27 +7,12 @@ platform:
   arch: arm64
 
 steps:
-- name: docker build stage
+- name: docker
   image: plugins/docker
   settings:
     username: jcm
     password:
       from_secret: docker_password
     repo: git.jcm.re/jcm/chocobot
-    tags: builder-latest
-    target: builder
     registry: git.jcm.re
-    cache_from: git.jcm.re/jcm/chocobot:builder-latest
-- name: docker install stage
-  image: plugins/docker
-  settings:
-    username: jcm
-    password:
-      from_secret: docker_password
-    repo: git.jcm.re/jcm/chocobot
-    tags: latest
-    target: runtime
-    registry: git.jcm.re
-    cache_from:
-    - git.jcm.re/jcm/chocobot:builder-latest
-    - git.jcm.re/jcm/chocobot:latest
+    cache_from: git.jcm.re/jcm/chocobot:latest

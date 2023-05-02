@@ -4,8 +4,6 @@
 #include "branding.hpp"
 #include "utils.hpp"
 
-#include <dpp/dpp.h>
-
 namespace chocobot {
 
 class gift_command : public command

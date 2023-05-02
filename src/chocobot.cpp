@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <date/date.h>
 #include <date/tz.h>
+#include <pqxx/result>
 
 #include "chocobot.hpp"
 #include "command.hpp"

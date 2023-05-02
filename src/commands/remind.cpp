@@ -2,7 +2,6 @@
 #include "utils.hpp"
 #include "i18n.hpp"
 
-#include <dpp/dpp.h>
 #include <date/date.h>
 #include <date/tz.h>
 

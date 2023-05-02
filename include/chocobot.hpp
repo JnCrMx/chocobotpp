@@ -1,8 +1,8 @@
 #pragma once
 
 #include <chrono>
-#include <dpp/dpp.h>
 #include <thread>
+#include <dpp/cluster.h>
 
 #include "config.hpp"
 #include "database.hpp"

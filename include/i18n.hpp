@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <pqxx/nontransaction>
 #include "database.hpp"
 
 namespace chocobot::i18n {

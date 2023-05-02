@@ -1,7 +1,5 @@
 #include "command.hpp"
 
-#include <dpp/dpp.h>
-
 namespace chocobot {
 
 class ping_command : public command

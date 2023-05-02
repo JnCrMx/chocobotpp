@@ -1,3 +1,4 @@
+#include <fstream>
 #include <spdlog/spdlog.h>
 #include <spdlog/cfg/env.h>
 
@@ -16,7 +17,7 @@ static void print_docs(std::string arg0)
 {
     std::cerr << "Usage: " << arg0 << " [config file]" << std::endl;
     std::cerr << R"EOF(
-If no argument is specified ChocoBot searched for the config file in the following locations:
+If no argument is specified ChocoBot searches for the config file in the following locations:
 1. $CHOCOBOT_CONFIG_FILE
 2. $CHOCOBOT_ROOT/config.json
 3. ./config.json

@@ -1,14 +1,11 @@
 #pragma once
 
-#include "chocobot.hpp"
 #include "database.hpp"
 #include "branding.hpp"
 #include "i18n.hpp"
 #include "command.hpp"
-#include "utils.hpp"
 
 #include <condition_variable>
-#include <dpp/dpp.h>
 #include <functional>
 #include <mutex>
 #include <vector>

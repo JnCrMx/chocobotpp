@@ -3,7 +3,6 @@
 #include "i18n.hpp"
 #include "branding.hpp"
 
-#include <dpp/dpp.h>
 #include <date/date.h>
 #include <date/tz.h>
 

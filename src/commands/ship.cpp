@@ -1,7 +1,7 @@
 #include "command.hpp"
 #include "utils.hpp"
 
-#include <dpp/dpp.h>
+#include <dpp/colors.h>
 
 #include <limits>
 #include <locale>

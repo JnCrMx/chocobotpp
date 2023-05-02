@@ -8,7 +8,6 @@
 #include <cmath>
 #include <date/date.h>
 #include <date/tz.h>
-#include <dpp/dpp.h>
 #include <ratio>
 
 namespace chocobot {

@@ -1,7 +1,11 @@
 #pragma once
 
-#include <dpp/dpp.h>
-#include <pqxx/pqxx>
+#include <dpp/snowflake.h>
+#include <dpp/user.h>
+#include <dpp/cache.h>
+#include <dpp/message.h>
+#include <pqxx/transaction_base>
+#include <pqxx/connection>
 
 #include "database.hpp"
 

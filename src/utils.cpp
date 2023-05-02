@@ -2,10 +2,12 @@
 #include "i18n.hpp"
 #include "branding.hpp"
 
-#include <dpp/dpp.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <cstdlib>
+#include <filesystem>
+#include <optional>
+#include <dpp/message.h>
+#include <pqxx/nontransaction>
 
 namespace chocobot::utils {
 

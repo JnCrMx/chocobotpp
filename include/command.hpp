@@ -1,12 +1,11 @@
 #pragma once
 
-#include <dpp/dpp.h>
 #include <fmt/format.h>
-#include <pqxx/pqxx>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include <memory>
+#include <dpp/cluster.h>
 
 #include "database.hpp"
 

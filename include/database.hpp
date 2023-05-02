@@ -3,14 +3,13 @@
 #include <deque>
 #include <optional>
 #include <string>
-#include <vector>
 #include <mutex>
 #include <memory>
 #include <set>
 #include <condition_variable>
 
 #include <dpp/snowflake.h>
-#include <pqxx/pqxx>
+#include <pqxx/transaction>
 
 namespace pqxx
 {

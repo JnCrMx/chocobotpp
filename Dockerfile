@@ -15,7 +15,7 @@ RUN tar -C /third_party/pqxx/install -xaf /third_party/pqxx.tar.gz
 
 COPY . /src
 RUN mkdir -p /build
-RUN /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+RUN /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="-O2" \
     -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
     -DUSE_INSTALLED_DPP=ON -DUSE_INSTALLED_PQXX=ON \
     -DCMAKE_SYSTEM_PREFIX_PATH="/third_party/dpp/install;/third_party/pqxx/install" \

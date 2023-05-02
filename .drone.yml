@@ -7,8 +7,8 @@ platform:
   arch: arm64
 
 steps:
-- name: docker
-  image: plugins/docker
+- name: build
+  image: plugins/buildah
   settings:
     username: jcm
     password:

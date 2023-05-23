@@ -7,11 +7,12 @@ platform:
   arch: arm64
 
 steps:
-- name: kaniko
-  image: plugins/kaniko
+- name: docker
+  image: plugins/docker
   settings:
     username: jcm
     password:
       from_secret: docker_password
     repo: git.jcm.re/jcm/chocobot
     registry: git.jcm.re
+    cache_from: git.jcm.re/jcm/chocobot:latest

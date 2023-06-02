@@ -5,7 +5,7 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.23
+  GIT_TAG        v10.0.24
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
@@ -24,6 +24,9 @@ FetchContent_Declare(cmake_git_version_tracking
   GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
 )
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_Declare(Simple-Web-Server
+  GIT_REPOSITORY https://gitlab.com/eidheim/Simple-Web-Server.git
+  GIT_TAG        27b41f5ee154cca0fce4fe2955dd886d04e3a4ed)
 
 set(BUILD_TZ_LIB ON CACHE BOOL "date: build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "date: Use the operating system's timezone database" FORCE)
@@ -39,7 +42,7 @@ set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
  
-FetchContent_MakeAvailable(date cmake_git_version_tracking)
+FetchContent_MakeAvailable(date cmake_git_version_tracking Simple-Web-Server)
 if(BUILD_TEST)
   FetchContent_MakeAvailable(Catch2)
 endif(BUILD_TEST)
@@ -103,6 +106,7 @@ target_link_libraries(chocobot PUBLIC
   ${ImageMagick_LIBRARIES}
   date::date date::date-tz
   cmake_git_version_tracking
+  simple-web-server
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )

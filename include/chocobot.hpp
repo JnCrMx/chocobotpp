@@ -3,10 +3,12 @@
 #include <chrono>
 #include <thread>
 #include <dpp/cluster.h>
+#include <server_http.hpp>
 
 #include "config.hpp"
 #include "database.hpp"
 
+using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 namespace chocobot {
 
 class chocobot
@@ -40,6 +42,9 @@ class chocobot
             std::string list;
             std::string done;
         } remind_queries{};
+
+        HttpServer m_api_server{};
+        std::jthread m_api_server_thread;
 };
 
 }

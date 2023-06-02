@@ -18,6 +18,9 @@ void chocobot::init()
 {
     i18n::init_i18n();
 
+    m_api_server.config.port = m_config.api_port;
+    m_api_server.config.address = m_config.api_address;
+
     m_bot.on_log([](const dpp::log_t log){
         switch(log.severity)
         {
@@ -160,6 +163,14 @@ void chocobot::check_reminds()
 
 void chocobot::start()
 {
+    std::promise<unsigned short> server_port;
+    m_api_server_thread = std::jthread([this, &server_port]() {
+        m_api_server.start([&server_port](unsigned short port) {
+            server_port.set_value(port);
+        });
+    });
+    spdlog::info("API server running on {}:{} (requested port {})", m_config.api_address, server_port.get_future().get(), m_config.api_port);
+
     m_bot.start(dpp::st_wait);
 }
 

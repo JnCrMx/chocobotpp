@@ -109,7 +109,7 @@ void chocobot::check_reminds()
         int id = row.at("id").as<int>();
         dpp::snowflake uid = row.at("uid").as<dpp::snowflake>();
         dpp::snowflake guild_id = row.at("guild").as<dpp::snowflake>();
-        std::string message = row.at("message").as<std::string>();
+        std::optional<std::string> message = row.at("message").as<std::optional<std::string>>();
         dpp::snowflake issuer_id = row.at("issuer").as<dpp::snowflake>();
         system_time time = system_time(std::chrono::milliseconds(row.at("time").as<unsigned long>()));
         dpp::snowflake channel_id = row.at("channel").as<dpp::snowflake>();
@@ -127,17 +127,17 @@ void chocobot::check_reminds()
         std::string bot_message;
         if(uid != issuer_id)
         {
-            if(message.empty())
+            if(!message || message->empty())
                 bot_message = i18n::translate(txn, guild, "reminder.other.plain", user.get_mention(), issuer.format_username());
             else
-                bot_message = i18n::translate(txn, guild, "reminder.other.message", user.get_mention(), issuer.format_username(), message);
+                bot_message = i18n::translate(txn, guild, "reminder.other.message", user.get_mention(), issuer.format_username(), *message);
         }
         else
         {
-            if(message.empty())
+            if(!message || message->empty())
                 bot_message = i18n::translate(txn, guild, "reminder.self.plain", user.get_mention());
             else
-                bot_message = i18n::translate(txn, guild, "reminder.self.message", user.get_mention(), message);
+                bot_message = i18n::translate(txn, guild, "reminder.self.message", user.get_mention(), *message);
         }
         if(now - time > 5min)
         {

@@ -1,4 +1,4 @@
-FROM docker.io/alpine:3.18.0 AS builder
+FROM docker.io/alpine:3.17.3 AS builder
 RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.82-dev
 
 ARG DPP_VERSION=v10.0.23
@@ -24,7 +24,7 @@ RUN /usr/bin/cmake --build /build --config RelWithDebInfo --target all --paralle
 RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/dpp-config.cmake /src/cmake
 RUN /usr/bin/cmake --install /build --prefix "/install"
 
-FROM docker.io/alpine:3.18.0 AS runtime
+FROM docker.io/alpine:3.17.3 AS runtime
 RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick imagemagick-c++ boost1.82
 COPY --from=builder /install /usr
 CMD ["chocobot"]

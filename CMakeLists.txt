@@ -5,7 +5,7 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.23
+  GIT_TAG        v10.0.24
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git

@@ -22,15 +22,15 @@ namespace pqxx
         }
         static zview to_buf(char *begin, char *end, dpp::snowflake const &value)
         {
-            return string_traits<uint64_t>::to_buf(begin, end, value);
+            return string_traits<uint64_t>::to_buf(begin, end, static_cast<uint64_t>(value));
         }
         static char *into_buf(char *begin, char *end, dpp::snowflake const &value)
         {
-            return string_traits<uint64_t>::into_buf(begin, end, value);
+            return string_traits<uint64_t>::into_buf(begin, end, static_cast<uint64_t>(value));
         }
         static size_t size_buffer(dpp::snowflake const &value) noexcept
         {
-            return string_traits<uint64_t>::size_buffer(value);
+            return string_traits<uint64_t>::size_buffer(static_cast<uint64_t>(value));
         }
     };
 }

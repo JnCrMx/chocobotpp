@@ -17,9 +17,9 @@ struct config
     config(nlohmann::json j) : 
         token(j["token"]),
         db_uri(j["database"]),
-        bugreport_command(j["bugreport"]),
-        api_port(j["api"]["port"]),
-        api_address(j["api"]["address"])
+        bugreport_command(j.value("bugreport", "false")),
+        api_port(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("port", 8080)),
+        api_address(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("address", ""))
     {}
     config() = default;
 };

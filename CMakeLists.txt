@@ -66,6 +66,7 @@ find_package(spdlog REQUIRED)
 find_package(ImageMagick COMPONENTS Magick++ MagickCore REQUIRED)
 
 set(SOURCES main.cpp
+            src/api.cpp
             src/database.cpp
             src/chocobot.cpp
             src/i18n.cpp
@@ -87,6 +88,7 @@ set(SOURCES main.cpp
             src/games/quiz.cpp)
 set(HEADERS "include/chocobot.hpp"
             "include/database.hpp"
+            "include/api.hpp"
             "include/command.hpp"
             "include/games.hpp"
             "include/i18n.hpp"

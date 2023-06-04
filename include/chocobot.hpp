@@ -3,10 +3,10 @@
 #include <chrono>
 #include <thread>
 #include <dpp/cluster.h>
-#include <server_http.hpp>
 
 #include "config.hpp"
 #include "database.hpp"
+#include "api.hpp"
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 namespace chocobot {
@@ -18,7 +18,8 @@ class chocobot
             m_bot(config.token, dpp::i_default_intents | dpp::i_message_content, /*token, intents*/
                   0, 0, 1, true,  /*shards, cluster_id, maxclusters, compressed*/
                   {dpp::cp_aggressive, dpp::cp_none, dpp::cp_none}, /*policy*/
-                  4, 1) /*request_threads, request_threads_raw*/
+                  4, 1) /*request_threads, request_threads_raw*/,
+            m_api(m_config, m_db, this)
         {
             init();
         }
@@ -33,6 +34,8 @@ class chocobot
 
         void check_reminds();
 
+        friend api;
+
         config m_config;
         dpp::cluster m_bot;
         database m_db;
@@ -43,8 +46,7 @@ class chocobot
             std::string done;
         } remind_queries{};
 
-        HttpServer m_api_server{};
-        std::jthread m_api_server_thread;
+        api m_api;
 };
 
 }

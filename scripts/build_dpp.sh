@@ -14,4 +14,4 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 cmake --build /build --config RelWithDebInfo --target all --parallel $(nproc) --
 cmake --install /build --prefix "/install"
 
-tar -C /install -cavf /out/dpp-${DPP_VERSION}-$(arch | sed s/x86_64/amd64/).tar.gz .
+tar -C /install -cavf /out/dpp-${DPP_VERSION}-$(arch).tar.gz .

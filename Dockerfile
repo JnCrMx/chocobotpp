@@ -1,18 +1,14 @@
 FROM docker.io/alpine:3.18 AS builder
-RUN apk add --no-cache clang16 clang16-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.82-dev
+RUN apk add --no-cache clang16 clang16-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.82-dev curl
 
-ARG TARGETARCH
 ARG DPP_VERSION=v10.0.24
 ARG PQXX_VERSION=7.7.5
 
 RUN mkdir -p /third_party/dpp/install
-# Download prebuilt DPP
-ADD https://files.jcm.re/dpp-${DPP_VERSION}-${TARGETARCH}.tar.gz /third_party/dpp.tar.gz
-RUN tar -C /third_party/dpp/install -xaf /third_party/dpp.tar.gz
+RUN curl https://files.jcm.re/dpp-${DPP_VERSION}-$(arch).tar.gz | tar -C /third_party/dpp/install -xz
 
 RUN mkdir -p /third_party/pqxx/install
-ADD https://files.jcm.re/libpqxx-${PQXX_VERSION}-${TARGETARCH}.tar.gz /third_party/pqxx.tar.gz
-RUN tar -C /third_party/pqxx/install -xaf /third_party/pqxx.tar.gz
+RUN curl https://files.jcm.re/libpqxx-${PQXX_VERSION}-$(arch).tar.gz | tar -C /third_party/pqxx/install -xz
 
 COPY . /src
 RUN mkdir -p /build

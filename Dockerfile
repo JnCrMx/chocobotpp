@@ -1,16 +1,17 @@
-FROM docker.io/alpine:3.17.3 AS builder
-RUN apk add --no-cache clang14 clang14-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.80-dev
+FROM docker.io/alpine:3.18 AS builder
+RUN apk add --no-cache clang16 clang16-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.82-dev
 
-ARG DPP_VERSION=v10.0.23
-ARG PQXX_VERSION=7.7.4
+ARG TARGETARCH
+ARG DPP_VERSION=v10.0.24
+ARG PQXX_VERSION=7.7.5
 
 RUN mkdir -p /third_party/dpp/install
 # Download prebuilt DPP
-ADD https://files.jcm.re/dpp-${DPP_VERSION}.tar.gz /third_party/dpp.tar.gz
+ADD https://files.jcm.re/dpp-${DPP_VERSION}-${TARGETARCH}.tar.gz /third_party/dpp.tar.gz
 RUN tar -C /third_party/dpp/install -xaf /third_party/dpp.tar.gz
 
 RUN mkdir -p /third_party/pqxx/install
-ADD https://files.jcm.re/libpqxx-${PQXX_VERSION}.tar.gz /third_party/pqxx.tar.gz
+ADD https://files.jcm.re/libpqxx-${PQXX_VERSION}-${TARGETARCH}.tar.gz /third_party/pqxx.tar.gz
 RUN tar -C /third_party/pqxx/install -xaf /third_party/pqxx.tar.gz
 
 COPY . /src
@@ -24,7 +25,7 @@ RUN /usr/bin/cmake --build /build --config RelWithDebInfo --target all --paralle
 RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/dpp-config.cmake /src/cmake
 RUN /usr/bin/cmake --install /build --prefix "/install"
 
-FROM docker.io/alpine:3.17.3 AS runtime
-RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick imagemagick-c++ boost1.80
+FROM docker.io/alpine:3.18 AS runtime
+RUN apk add --no-cache libstdc++ postgresql14 spdlog imagemagick imagemagick-c++ boost1.82
 COPY --from=builder /install /usr
 CMD ["chocobot"]

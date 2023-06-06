@@ -123,7 +123,7 @@ boost::asio::awaitable<void> api::get_guilds(Res res, Req req)
         auto& g = guilds.emplace_back();
         g["id"] = std::to_string(guild_id);
         g["name"] = guild.name;
-        g["icon_url"] = guild.get_icon_url();
+        g["iconUrl"] = guild.get_icon_url();
     }
     res->write(nlohmann::to_string(guilds));
 }
@@ -148,8 +148,36 @@ boost::asio::awaitable<void> api::guild_info(Res res, Req req)
             co_return;
         }
     }
-
     auto guild = co_await awaitable<dpp::guild>(&dpp::cluster::guild_get, &m_chocobot->m_bot, guild_id);
+
+    std::optional<struct guild> guild_settings;
+    {
+        auto conn = m_db.acquire_connection();
+        pqxx::nontransaction txn{*conn};
+        guild_settings = m_db.get_guild(guild_id, txn);
+    }
+    if(!guild_settings)
+    {
+        res->write(StatusCode::client_error_not_found);
+        co_return;
+    }
+
+    nlohmann::json guild_info{};
+    guild_info["guildName"] = guild.name;
+    guild_info["guildId"] = std::to_string(guild_id);
+    guild_info["commandChannelId"] = std::to_string(guild_settings->command_channel);
+    guild_info["commandChannelName"] = (co_await awaitable<dpp::channel>(&dpp::cluster::channel_get, &m_chocobot->m_bot, guild_settings->command_channel)).name;
+    guild_info["iconUrl"] = guild.get_icon_url();
+
+    guild_info["owner"] = {};
+    dpp::guild_member owner = co_await awaitable<dpp::guild_member>(&dpp::cluster::guild_get_member, &m_chocobot->m_bot, guild_id, guild.owner_id);
+    dpp::user owner_user = co_await awaitable<dpp::user_identified>(&dpp::cluster::user_get_cached, &m_chocobot->m_bot, guild.owner_id);
+    guild_info["owner"]["userId"] = std::to_string(owner.user_id);
+    guild_info["owner"]["tag"] = owner_user.format_username();
+    guild_info["owner"]["nickname"] = owner.nickname.empty() ? owner_user.username : owner.nickname;
+    guild_info["owner"]["avatarUrl"] = owner.get_avatar_url().empty() ? owner_user.get_avatar_url() : owner.get_avatar_url();
+
+    res->write(nlohmann::to_string(guild_info));
 }
 
 }

@@ -1,5 +1,9 @@
 {
     "token": "your-bot-token",
     "database": "postgres://chocobot@localhost/chocobot",
-    "bugreport": "sendmail -S ... -f chocobot-bugreport@... ...@..."
+    "bugreport": "sendmail -S ... -f chocobot-bugreport@... ...@...",
+    "api": {
+        "port": 8080,
+        "address": ""
+    }
 }

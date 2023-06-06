@@ -36,6 +36,7 @@ option(BUILD_TEST "Build the tests" OFF)
 if(NOT BUILD_TEST)
   set(DPP_BUILD_TEST OFF CACHE BOOL "DPP: Build the test program" FORCE)
 endif(NOT BUILD_TEST)
+set(DPP_CORO ON CACHE BOOL "DPP: Experimental support for C++20 coroutines" FORCE)
 set(BUILD_VOICE_SUPPORT OFF CACHE BOOL "DPP: Build voice support" FORCE)
 set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
 
@@ -96,7 +97,7 @@ set(HEADERS "include/chocobot.hpp"
             "include/branding.hpp"
             "include/config.hpp")
 add_executable(chocobot ${SOURCES})
-target_precompile_headers(chocobot PRIVATE ${HEADERS})
+#target_precompile_headers(chocobot PRIVATE ${HEADERS})
 
 target_include_directories(chocobot PUBLIC include/)
 

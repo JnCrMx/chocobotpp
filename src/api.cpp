@@ -24,12 +24,17 @@ api::api(const config& config, database& db, chocobot* chocobot) : m_address(con
         response->write(StatusCode::client_error_not_found);
     };
     m_server.resource[path("/token/check")]["POST"] = std::bind_front(&api::check_token, this);
-    m_server.resource[path("/token/guilds")]["GET"] = std::bind_front(&api::get_guilds, this);
+    m_server.resource[path("/token/guilds")]["GET"] = [this](Res res, Req req){
+        boost::asio::co_spawn(*m_server.io_service, get_guilds(res, req), boost::asio::detached);
+    };
+    m_server.resource[path("/([\\d]+)/guild/info")]["GET"] = [this](Res res, Req req){
+        boost::asio::co_spawn(*m_server.io_service, guild_info(res, req), boost::asio::detached);
+    };
 }
 
 void api::prepare()
 {
-    m_prepared_commands.check_token = m_db.prepare("check_token", "SELECT user FROM tokens WHERE token = $1");
+    m_prepared_commands.check_token = m_db.prepare("check_token", "SELECT \"user\" FROM tokens WHERE token = $1");
 }
 
 void api::start()
@@ -78,23 +83,73 @@ void api::check_token(Res res, Req req)
     auto result = txn.exec_prepared(m_prepared_commands.check_token, token);
     res->write(result.empty() ? "false" : "true");
 }
-void api::get_guilds(Res res, Req req)
+
+template<typename Result, typename Func, typename CompletionToken = boost::asio::use_awaitable_t<>>
+auto async(Func fn, CompletionToken token = {})
+{
+    auto initiate = [fn]<typename Handler>(Handler&& handler){
+        fn([h = std::make_shared<Handler>(std::forward<Handler>(handler))](const dpp::confirmation_callback_t& c)mutable{
+            (*h)(c.get<Result>());
+        });
+    };
+    return boost::asio::async_initiate<CompletionToken, void(Result)>(initiate, token);
+}
+
+template<typename Result, typename Func, typename... Args>
+auto awaitable(Func fn, Args... args)
+{
+    return async<Result>(std::bind_front(fn, args...));
+}
+
+boost::asio::awaitable<void> api::get_guilds(Res res, Req req)
 {
     dpp::snowflake user;
     if(auto opt = get_user(req); opt.has_value()) {
         user = opt.value();
     } else {
         res->write(StatusCode::client_error_unauthorized);
-        return;
+        co_return;
     }
 
-    m_chocobot->m_bot.current_user_get_guilds([res](dpp::confirmation_callback_t v){
-        if(v.is_error()) {
-            res->write(StatusCode::server_error_internal_server_error, v.get_error().message);
-            return;
+    const auto& guild_map = co_await awaitable<dpp::guild_map>(&dpp::cluster::current_user_get_guilds, &m_chocobot->m_bot);
+
+    nlohmann::json guilds = nlohmann::json::array();
+
+    auto conn = m_db.acquire_connection();
+    pqxx::nontransaction txn{*conn};
+    for(const auto& [guild_id, guild] : guild_map)
+    {
+        if(!m_db.get_coins(user, guild_id, txn).has_value()) continue;
+        auto& g = guilds.emplace_back();
+        g["id"] = std::to_string(guild_id);
+        g["name"] = guild.name;
+        g["icon_url"] = guild.get_icon_url();
+    }
+    res->write(nlohmann::to_string(guilds));
+}
+
+boost::asio::awaitable<void> api::guild_info(Res res, Req req)
+{
+    dpp::snowflake user;
+    if(auto opt = get_user(req); opt.has_value()) {
+        user = opt.value();
+    } else {
+        res->write(StatusCode::client_error_unauthorized);
+        co_return;
+    }
+
+    dpp::snowflake guild_id = std::stoul(req->path_match.str(1));
+    {
+        auto conn = m_db.acquire_connection();
+        pqxx::nontransaction txn{*conn};
+        if(!m_db.get_coins(user, guild_id, txn).has_value())
+        {
+            res->write(StatusCode::client_error_forbidden);
+            co_return;
         }
-        auto guilds = v.get<dpp::guild_map>();
-    });
+    }
+
+    auto guild = co_await awaitable<dpp::guild>(&dpp::cluster::guild_get, &m_chocobot->m_bot, guild_id);
 }
 
 }

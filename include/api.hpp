@@ -37,6 +37,7 @@ namespace chocobot {
             std::optional<dpp::snowflake> get_user(Req req);
 
             void check_token(Res res, Req req);
-            void get_guilds(Res res, Req req);
+            boost::asio::awaitable<void> get_guilds(Res res, Req req);
+            boost::asio::awaitable<void> guild_info(Res res, Req req);
     };
 }

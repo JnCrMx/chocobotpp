@@ -11,3 +11,12 @@ steps:
       snapshot-mode: redo
       enable-cache: true
       cache-repo: git.jcm.re/jcm/chocobot-cache
+    backend_options:
+      kubernetes:
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 1000m
+          limits:
+            memory: 3Gi
+            cpu: 2500m

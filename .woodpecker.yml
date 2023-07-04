@@ -1,0 +1,10 @@
+steps:
+  docker:
+    image: plugins/kaniko
+    settings:
+      username: jcm
+      password:
+        from_secret: docker_password
+      repo: git.jcm.re/jcm/chocobot
+      registry: git.jcm.re
+      tags: latest

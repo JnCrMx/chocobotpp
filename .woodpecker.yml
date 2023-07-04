@@ -16,7 +16,9 @@ steps:
         resources:
           requests:
             memory: 1Gi
-            cpu: 1000m
+            cpu: 500m
           limits:
             memory: 3Gi
             cpu: 2500m
+        nodeSelector:
+          speed-grade: fast

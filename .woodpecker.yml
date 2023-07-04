@@ -8,3 +8,4 @@ steps:
       repo: git.jcm.re/jcm/chocobot
       registry: git.jcm.re
       tags: latest
+      snapshot-mode: redo

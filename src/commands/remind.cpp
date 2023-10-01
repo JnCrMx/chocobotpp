@@ -10,6 +10,8 @@ namespace chocobot {
 class remind_command : public command
 {
     private:
+		constexpr static std::size_t max_message_length = 1000;
+
         std::string statement;
     public:
         remind_command() {}
@@ -100,6 +102,11 @@ class remind_command : public command
 			std::string message(std::istreambuf_iterator<char>(args), {});
 			//spdlog::debug("{} wants to remind {} at {} with message \"{}\"", event.msg.author.id, user, zoned, message);
 
+			if(message.length() > max_message_length) {
+				event.reply(utils::build_error(connection, guild, "command.remind.error.length"));
+				return command::result::user_error;
+			}
+
 			if(time < now)
 			{
 				event.reply(utils::build_error(connection, guild, "command.remind.error.past"));
@@ -108,8 +115,8 @@ class remind_command : public command
 
 			{
 				pqxx::work txn(connection);
-				txn.exec_prepared0(statement, user, guild.id, 
-					message.empty()?std::optional<std::string>{}:message, 
+				txn.exec_prepared0(statement, user, guild.id,
+					message.empty()?std::optional<std::string>{}:message,
 					std::chrono::duration_cast<std::chrono::milliseconds>(zoned.get_sys_time().time_since_epoch()).count(),
 					event.msg.author.id, event.msg.channel_id);
 				txn.commit();

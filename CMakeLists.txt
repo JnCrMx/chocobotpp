@@ -39,6 +39,7 @@ endif(NOT BUILD_TEST)
 set(DPP_CORO ON CACHE BOOL "DPP: Experimental support for C++20 coroutines" FORCE)
 set(BUILD_VOICE_SUPPORT OFF CACHE BOOL "DPP: Build voice support" FORCE)
 set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
+set(USE_OPENSSL OFF CACHE BOOL "Simple-Web-Server: set OFF to build without OpenSSL" FORCE)
 
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
@@ -110,6 +111,7 @@ target_link_libraries(chocobot PUBLIC
   date::date date::date-tz
   cmake_git_version_tracking
   simple-web-server
+  ssl
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )
@@ -124,6 +126,7 @@ set_target_properties(chocobot PROPERTIES
   CXX_STANDARD 23
   CXX_STANDARD_REQUIRED ON
 )
+target_compile_features(chocobot PUBLIC cxx_std_23)
 
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources

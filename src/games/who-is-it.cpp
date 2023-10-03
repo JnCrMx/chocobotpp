@@ -50,9 +50,16 @@ class who_is_it : public multi_player_game
                     (size_t)(((double)size.width())*i),
                     (size_t)(((double)size.height())*i)
                 });
-                img.filterType(Magick::FilterType::PointFilter);
+
+#if MagickLibInterface == 10
+                using MagickFilterType = Magick::FilterType;
+#elif MagickLibInterface == 6
+                using MagickFilterType = Magick::FilterTypes;
+#endif
+
+                img.filterType(MagickFilterType::PointFilter);
                 img.resize(size);
-                
+
                 img.animationDelay(100);
                 img.magick("GIF");
                 frames.push_back(img);
@@ -80,7 +87,7 @@ class who_is_it : public multi_player_game
                 Magick::Image img{Magick::Geometry{pw, ph}, Magick::Color("black")};
                 img.copyPixels(avatar, Magick::Geometry{pw, ph, px, py}, Magick::Offset{0, 0});
                 img.resize(size);
-                
+
                 img.animationDelay(25);
                 img.magick("GIF");
                 frames.push_back(img);
@@ -247,7 +254,7 @@ class who_is_it : public multi_player_game
                 else
                 {
                     pqxx::nontransaction txn{*conn};
-                    
+
                     dpp::embed eb{};
                     eb.set_title(i18n::translate(txn, m_guild, "game.weristes.results.title"));
                     eb.set_description(i18n::translate(txn, m_guild, "game.weristes.results.noone",

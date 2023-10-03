@@ -5,7 +5,7 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.24
+  GIT_TAG        v10.0.26
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
@@ -19,7 +19,7 @@ FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.1.0
 )
-FetchContent_Declare(cmake_git_version_tracking                   
+FetchContent_Declare(cmake_git_version_tracking
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
   GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
 )
@@ -42,7 +42,7 @@ set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
 
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
- 
+
 FetchContent_MakeAvailable(date cmake_git_version_tracking Simple-Web-Server)
 if(BUILD_TEST)
   FetchContent_MakeAvailable(Catch2)

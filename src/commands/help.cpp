@@ -16,7 +16,7 @@ class help_command : public command
             return "help";
         }
 
-        result execute(chocobot&, pqxx::connection& conn, database& db, 
+        dpp::coroutine<result> execute(chocobot&, pqxx::connection& conn, database& db,
             dpp::cluster&, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
@@ -37,7 +37,7 @@ class help_command : public command
                 }
                 event.reply(dpp::message{dpp::snowflake{}, eb});
 
-                return result::success;
+                co_return result::success;
             }
             else
             {
@@ -48,16 +48,16 @@ class help_command : public command
                 if(!map.contains(command))
                 {
                     event.reply(utils::build_error(txn, guild, "command.help.error.noent"));
-                    return result::user_error;
+                    co_return result::user_error;
                 }
                 auto helpText = i18n::translate(txn, guild, "command."+command+".help");
                 event.reply(i18n::translate(txn, guild, "command."+command+".usage",
-                    fmt::arg("prefix", guild.prefix), 
+                    fmt::arg("prefix", guild.prefix),
                     fmt::arg("cmd", guild.prefix+command),
                     fmt::arg("command", command),
                     fmt::arg("help", helpText)));
 
-                return result::success;
+                co_return result::success;
             }
         }
     private:

@@ -21,7 +21,7 @@ class random_command : public command
             return "random";
         }
 
-        result execute(chocobot& bot, pqxx::connection& conn, database& db,
+        dpp::coroutine<result> execute(chocobot& bot, pqxx::connection& conn, database& db,
             dpp::cluster& discord, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
@@ -29,15 +29,15 @@ class random_command : public command
             {
                 std::uniform_int_distribution<int> dist(0, event.msg.mentions.size()-1);
                 auto [user, member] = event.msg.mentions.at(dist(rng));
-                
+
                 event.reply(i18n::translate(conn, guild, "command.random.user", user.get_mention()));
-                return result::success;
+                co_return result::success;
             }
             if(!event.msg.mention_roles.empty())
             {
                 std::set<dpp::snowflake> roles(event.msg.mention_roles.begin(), event.msg.mention_roles.end());
-                discord.guild_get_members(guild.id, 1000, 0ul, [this, roles, event, guild, &db](const dpp::confirmation_callback_t& cb)
-                {
+                auto cb = co_await discord.co_guild_get_members(guild.id, 1000, 0ul);
+                if(!cb.is_error()) {
                     auto map = cb.get<dpp::guild_member_map>();
                     std::vector<dpp::guild_member> members;
                     for(auto [_, member] : map)
@@ -56,13 +56,14 @@ class random_command : public command
 
                     auto conn = db.acquire_connection();
                     event.reply(i18n::translate(*conn, guild, "command.random.user", member.get_mention()));
-                });
-                return command::result::deferred;
+                    co_return command::result::success;
+                }
+                co_return command::result::system_error;
             }
             if(event.msg.mention_everyone)
             {
-                discord.guild_get_members(guild.id, 1000, 0ul, [this, event, guild, &db](const dpp::confirmation_callback_t& cb)
-                {
+                auto cb = co_await discord.co_guild_get_members(guild.id, 1000, 0ul);
+                if(!cb.is_error()) {
                     auto map = cb.get<dpp::guild_member_map>();
                     std::vector<dpp::guild_member> members;
                     for(auto [_, m] : map)
@@ -75,8 +76,9 @@ class random_command : public command
 
                     auto conn = db.acquire_connection();
                     event.reply(i18n::translate(*conn, guild, "command.random.user", member.get_mention()));
-                });
-                return command::result::deferred;
+                    co_return command::result::success;
+                }
+                co_return command::result::system_error;
             }
 
             std::string arg1, arg2;
@@ -85,7 +87,7 @@ class random_command : public command
             if(arg1.empty() || arg2.empty())
             {
                 event.reply(utils::build_error(conn, guild, "command.random.error.unsupported"));
-                return result::user_error;
+                co_return result::user_error;
             }
 
             auto to_int = [](std::string_view s) -> std::optional<intmax_t>
@@ -103,7 +105,7 @@ class random_command : public command
             {
                 std::uniform_int_distribution<int> dist(*a, *b);
                 event.reply(i18n::translate(conn, guild, "command.random.number", dist(rng)));
-                return result::success;
+                co_return result::success;
             }
             else
             {
@@ -123,11 +125,11 @@ class random_command : public command
                     if(!guild.operators.contains(event.msg.author.id))
                     {
                         event.reply(utils::build_error(conn, guild, "command.random.error.perm"));
-                        return result::user_error;
+                        co_return result::user_error;
                     }
                 }
                 event.reply(i18n::translate(conn, guild, "command.random.word", term));
-                return result::success;
+                co_return result::success;
             }
         }
     private:

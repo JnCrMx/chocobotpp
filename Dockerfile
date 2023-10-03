@@ -1,7 +1,7 @@
 FROM docker.io/alpine:3.18 AS builder
 RUN apk add --no-cache clang16 clang16-dev alpine-sdk ninja cmake git zlib-dev zlib-static spdlog-dev openssl-dev openssl-libs-static postgresql14-dev imagemagick-dev boost1.82-dev curl
 
-ARG DPP_VERSION=v10.0.24
+ARG DPP_VERSION=v10.0.26
 ARG PQXX_VERSION=7.7.5
 
 RUN mkdir -p /third_party/dpp/install

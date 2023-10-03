@@ -52,7 +52,7 @@ class remind_command : public command
 		}
 
 	public:
-		result execute(chocobot&, pqxx::connection& connection, database&, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream& args) override
+		dpp::coroutine<result> execute(chocobot&, pqxx::connection& connection, database&, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream& args) override
         {
 			std::string first;
 			args >> first;
@@ -70,7 +70,7 @@ class remind_command : public command
 				catch(const dpp::rest_exception& ex)
 				{
 					event.reply(utils::build_error(connection, guild, "command.remind.error.noent"));
-					return command::result::user_error;
+					co_return command::result::user_error;
 				}
 			}
 
@@ -93,7 +93,7 @@ class remind_command : public command
 			catch(const std::runtime_error& ex)
 			{
 				event.reply(utils::build_error(connection, guild, "command.remind.error.fmt"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 			while(args.peek() == ' ') args.get(); // skip trailing whitespace of message
 
@@ -104,13 +104,13 @@ class remind_command : public command
 
 			if(message.length() > max_message_length) {
 				event.reply(utils::build_error(connection, guild, "command.remind.error.length"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 
 			if(time < now)
 			{
 				event.reply(utils::build_error(connection, guild, "command.remind.error.past"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 
 			{
@@ -132,7 +132,7 @@ class remind_command : public command
 				event.reply(dpp::message{dpp::snowflake{}, i18n::translate(connection, guild, "command.remind.other", forced_sys, other_user.format_username())});
 			}
 
-			return result::success;
+			co_return result::success;
 		}
 
 		void prepare(chocobot&, database& db) override

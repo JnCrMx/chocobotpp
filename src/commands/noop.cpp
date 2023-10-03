@@ -12,11 +12,11 @@ class noop_command : public command
             return "noop";
         }
 
-        result execute(chocobot&, pqxx::connection&, database&, 
+        dpp::coroutine<result> execute(chocobot&, pqxx::connection&, database&,
             dpp::cluster&, const guild&,
             const dpp::message_create_t&, std::istream&) override
         {
-            return result::success;
+            co_return result::success;
         }
     private:
         static command_register<noop_command> reg;

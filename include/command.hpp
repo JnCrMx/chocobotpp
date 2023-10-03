@@ -6,6 +6,7 @@
 #include <spdlog/fmt/ostr.h>
 #include <memory>
 #include <dpp/cluster.h>
+#include <dpp/coro/coroutine.h>
 
 #include "database.hpp"
 
@@ -46,9 +47,10 @@ class command
                 case result::system_error:
                     return spdlog::level::warn;
             }
+            return spdlog::level::warn;
         }
 
-        virtual result execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
+        virtual dpp::coroutine<result> execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
         virtual std::string get_name() = 0;
         virtual void prepare(chocobot&, database&) {}
         virtual ~command() {}
@@ -64,8 +66,8 @@ struct command_factory
        		if(map == nullptr)
             {
                 map = new map_type;
-            } 
-        	return map; 
+            }
+        	return map;
    		}
 
 	private:
@@ -76,7 +78,7 @@ template<typename T>
 struct command_register : command_factory
 {
     command_register(T* command)
-    { 
+    {
         get_map()->insert(std::make_pair(command->get_name(), std::unique_ptr<class command>(command)));
         spdlog::info("Registered command {}", command->get_name());
     }

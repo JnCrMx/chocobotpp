@@ -20,7 +20,7 @@ class coins_command : public command
             return "coins";
         }
 
-        result execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
+        dpp::coroutine<result> execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
         {
             int coins;
             using system_time = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
@@ -56,7 +56,7 @@ class coins_command : public command
             }
             event.reply(dpp::message(event.msg.channel_id, embed));
 
-            return command::result::success;
+            co_return command::result::success;
         }
 
         void prepare(chocobot&, database& db) override

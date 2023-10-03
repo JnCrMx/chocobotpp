@@ -59,7 +59,7 @@ class mystats_command : public command
             return "mystats";
         }
 
-        result execute(chocobot&, pqxx::connection& conn, database& db, 
+        dpp::coroutine<result> execute(chocobot&, pqxx::connection& conn, database& db,
             dpp::cluster&, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
@@ -96,7 +96,7 @@ class mystats_command : public command
             }
             event.reply(dpp::message{dpp::snowflake{}, eb});
 
-            return result::success;
+            co_return result::success;
         }
     private:
         static dpp::embed new_embed(dpp::user user, pqxx::nontransaction& txn, const guild& guild)

@@ -16,7 +16,7 @@ class gift_command : public command
             return "gift";
         }
 
-        result execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream& args) override
+        dpp::coroutine<result> execute(chocobot&, pqxx::connection& connection, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream& args) override
         {
 			std::string receiver;
 			args >> receiver;
@@ -24,30 +24,30 @@ class gift_command : public command
 			if(!recvo.has_value())
 			{
 				event.reply(utils::build_error(connection, guild, "command.gift.error.who"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 			int amount;
 			args >> amount;
 			if(amount < 0)
 			{
 				event.reply(utils::build_error(connection, guild, "command.gift.error.negative"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 			if(amount == 0)
 			{
 				event.reply(utils::build_error(connection, guild, "command.gift.error.zero"));
-				return command::result::user_error;
+				co_return command::result::user_error;
 			}
 
-			auto recv = discord.user_get_cached_sync(recvo.value());
+			auto recv = (co_await discord.co_user_get_cached(recvo.value())).get<dpp::user_identified>();
 			{
 				pqxx::work txn(connection);
 				if(db.get_coins(event.msg.author.id, guild.id, txn) < amount)
 				{
 					event.reply(utils::build_error(txn, guild, "command.gift.error.not_enough"));
-					return command::result::user_error;
+					co_return command::result::user_error;
 				}
-				
+
 				if(!recv.is_bot())
 				{
 					db.change_coins(event.msg.author.id, guild.id, -amount, txn);
@@ -67,7 +67,7 @@ class gift_command : public command
 			}
 			event.reply(dpp::message({}, embed));
 
-			return command::result::success;
+			co_return command::result::success;
 		}
     private:
         static command_register<gift_command> reg;

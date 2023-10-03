@@ -21,7 +21,7 @@ class bugreport_command : public command
             return "bugreport";
         }
 
-        result execute(chocobot& bot, pqxx::connection& conn, database& db,
+        dpp::coroutine<result> execute(chocobot& bot, pqxx::connection& conn, database& db,
             dpp::cluster& discord, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
@@ -30,7 +30,7 @@ class bugreport_command : public command
             if(!args.good())
             {
                 event.reply(utils::build_error(conn, guild, "command.bugreport.error.empty"));
-                return result::user_error;
+                co_return result::user_error;
             }
 
             std::string subject;
@@ -39,7 +39,7 @@ class bugreport_command : public command
             if(subject.empty())
             {
                 event.reply(utils::build_error(conn, guild, "command.bugreport.error.empty"));
-                return result::user_error;
+                co_return result::user_error;
             }
 
             std::string body{std::istreambuf_iterator<char>(args), {}};
@@ -98,7 +98,7 @@ class bugreport_command : public command
                     }
                 });
                 thread.detach();
-                return result::deferred;
+                co_return result::deferred;
             }
 #else
             event.reply(utils::build_error(conn, guild, "command.bugreport.error.unsupported"));

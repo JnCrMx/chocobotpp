@@ -46,9 +46,9 @@ void chocobot::init()
         spdlog::info("Prepared command {}", name);
     }
 
-    m_bot.on_message_create([this](const dpp::message_create_t& event){
+    m_bot.on_message_create([this](dpp::message_create_t event) -> dpp::job {
         if(event.msg.author.is_bot())
-            return;
+            co_return;
         std::istringstream iss(event.msg.content);
         std::string command;
         iss >> command;
@@ -56,18 +56,18 @@ void chocobot::init()
         auto connection = m_db.acquire_connection();
         std::optional<guild> g = database::work(std::bind_front(&database::get_guild, &m_db, event.msg.guild_id), *connection);
         if(!g)
-            return;
+            co_return;
         guild guild = g.value();
 
         if(!command.starts_with(guild.prefix))
-            return;
+            co_return;
 
         command = command.substr(guild.prefix.size());
         if(!command_factory::get_map()->contains(command))
-            return;
+            co_return;
 
         auto& cmd = command_factory::get_map()->at(command);
-        command::result result = cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
+        command::result result = co_await cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
         spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);
     });
@@ -92,12 +92,12 @@ void chocobot::check_reminds()
 {
     using system_time = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
     using namespace std::literals::chrono_literals;
-    
+
     auto connection = m_db.acquire_connection();
 
     auto now = std::chrono::system_clock::now();
     spdlog::debug("Checking reminds for time {}", now);
-    
+
     pqxx::result result;
     {
         pqxx::nontransaction txn(*connection);

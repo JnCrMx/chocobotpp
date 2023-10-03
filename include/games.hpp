@@ -184,7 +184,7 @@ class game_command : public command
             return std::string(Game::name);
         }
 
-        result execute(chocobot& bot, pqxx::connection& conn, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
+        dpp::coroutine<result> execute(chocobot& bot, pqxx::connection& conn, database& db, dpp::cluster& discord, const guild& guild, const dpp::message_create_t& event, std::istream&) override
         {
             {
                 pqxx::nontransaction txn{conn};
@@ -196,13 +196,13 @@ class game_command : public command
                     embed.set_description(i18n::translate(txn, guild, "game.error.not_enough", Game::cost));
                     event.reply(dpp::message{dpp::snowflake{}, embed});
 
-                    return command::result::user_error;
+                    co_return command::result::user_error;
                 }
             }
-            
+
             Game* g = new Game(bot, db, discord, event.msg.author, guild, event.msg.channel_id);
             g->start();
-            return command::result::deferred;
+            co_return command::result::deferred;
         }
 
         template<typename T>

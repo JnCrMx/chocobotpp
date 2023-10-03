@@ -30,6 +30,9 @@ api::api(const config& config, database& db, chocobot* chocobot) : m_address(con
     m_server.resource[path("/([\\d]+)/guild/info")]["GET"] = [this](Res res, Req req){
         boost::asio::co_spawn(*m_server.io_service, guild_info(res, req), boost::asio::detached);
     };
+    m_server.resource[path("/([\\d]+)/user/self")]["GET"] = [this](Res res, Req req){
+        boost::asio::co_spawn(*m_server.io_service, get_self_user(res, req), boost::asio::detached);
+    };
 }
 
 void api::prepare()
@@ -178,6 +181,55 @@ boost::asio::awaitable<void> api::guild_info(Res res, Req req)
     guild_info["owner"]["avatarUrl"] = owner.get_avatar_url().empty() ? owner_user.get_avatar_url() : owner.get_avatar_url();
 
     res->write(nlohmann::to_string(guild_info));
+}
+
+boost::asio::awaitable<void> api::get_self_user(Res res, Req req)
+{
+    dpp::snowflake user;
+    if(auto opt = get_user(req); opt.has_value()) {
+        user = opt.value();
+    } else {
+        res->write(StatusCode::client_error_unauthorized);
+        co_return;
+    }
+
+    int coins = 0;
+    dpp::snowflake guild_id = std::stoul(req->path_match.str(1));
+    {
+        auto conn = m_db.acquire_connection();
+        pqxx::nontransaction txn{*conn};
+        if(auto coinsOpt = m_db.get_coins(user, guild_id, txn); coinsOpt.has_value())
+        {
+            coins = coinsOpt.value();
+        }
+        else
+        {
+            res->write(StatusCode::client_error_forbidden);
+            co_return;
+        }
+    }
+    std::optional<struct guild> guild_settings;
+    {
+        auto conn = m_db.acquire_connection();
+        pqxx::nontransaction txn{*conn};
+        guild_settings = m_db.get_guild(guild_id, txn);
+    }
+    if(!guild_settings)
+    {
+        res->write(StatusCode::client_error_not_found);
+        co_return;
+    }
+    // TODO: Check operator
+
+    dpp::guild_member member = co_await awaitable<dpp::guild_member>(&dpp::cluster::guild_get_member, &m_chocobot->m_bot, guild_id, user);
+    dpp::user member_user = co_await awaitable<dpp::user_identified>(&dpp::cluster::user_get_cached, &m_chocobot->m_bot, user);
+    
+    nlohmann::json j{};
+    j["userId"] = std::to_string(user);
+    j["tag"] = member_user.format_username();
+    j["nickname"] = member.nickname.empty() ? member_user.username : member.nickname;
+    j["avatarUrl"] = member.get_avatar_url().empty() ? member_user.get_avatar_url() : member.get_avatar_url();
+
 }
 
 }

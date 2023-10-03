@@ -4,6 +4,7 @@
 #include "database.hpp"
 
 #include <server_http.hpp>
+#include <boost/asio.hpp>
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 namespace chocobot {
@@ -39,5 +40,6 @@ namespace chocobot {
             void check_token(Res res, Req req);
             boost::asio::awaitable<void> get_guilds(Res res, Req req);
             boost::asio::awaitable<void> guild_info(Res res, Req req);
+            boost::asio::awaitable<void> get_self_user(Res res, Req req);
     };
 }

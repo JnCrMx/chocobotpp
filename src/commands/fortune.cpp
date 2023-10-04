@@ -97,6 +97,16 @@ class fortune_command : public paid_command
                     }
                     lines++;
                 }
+                // on some systems the last fortune is terminated by a \n%\n, but one some it is not
+                if(!fortune.empty())
+                {
+                    if(fortune.size() <= (max_length+1))
+                    {
+                        fortune_messages.push_back(fortune.substr(0, fortune.size()-1));
+                        count++;
+                    }
+                    else { too_long++; }
+                }
                 spdlog::trace("Loaded {} ({} were too long to load) fortunes from {} lines from file {}", count, too_long, lines, ent.path().string());
                 files++;
                 too_long_total += too_long;

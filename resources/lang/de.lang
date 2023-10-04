@@ -40,8 +40,11 @@ command.say.help=Sage etwas in einem Channel.
 command.ship.help=Ermittle die Shipping-Quote zwischen zwei Begriffen.
 command.shop.help=Shop, in dem du Rollen (z.B. Farbrollen) für @{coins} kaufen kannst.
 command.stats.help=Zeigt Statistiken über den Server an.
+command.quiz.help=Veranstalte ein Quiz.
 command.block.help=Öffne einen ?-Block.
 command.slot-machine.help=Spiele an einer Slot-Maschine.
+command.noop.help=Tues rein gar nichts.
+command.ping.help=Gebe den Ping vom Bot zu Discord zurück.
 command.glückskeks.help=Öffne einen Glückskeks.
 
 command.coins.usage={cmd} : {help}\n{cmd} <Nutzer> @{opcmd} : Zeige die @{coins} eines anderen Nutzers an.
@@ -67,6 +70,8 @@ command.shop.usage={cmd} : Zeige alle verfügbaren Rollen an.\n{cmd} i(nventory)
 command.stats.usage={cmd} : {help}
 command.block.usage={cmd} : {help}
 command.slot-machine.usage={cmd} : {help}
+command.noop.usage={cmd} : {help}
+command.ping.usage={cmd} : {help}\n{cmd} <Zahl> : Warte <Zahl> Sekunden bevor der Ping zurückgegeben wird.
 command.glückskeks.usage={cmd} : {help}
 
 command.coins.error.perm=Du darfst dir nicht die @{coins} anderer Nutzer anzeigen lassen!

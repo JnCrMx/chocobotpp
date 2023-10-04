@@ -5,5 +5,9 @@
     "api": {
         "port": 8080,
         "address": ""
+    },
+    "tax_rate": 0.05,
+    "taxes": {
+        "glückskeks": your-user-id
     }
 }

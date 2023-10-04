@@ -73,6 +73,7 @@ set(SOURCES main.cpp
             src/chocobot.cpp
             src/i18n.cpp
             src/utils.cpp
+            src/paid_command.cpp
             src/commands/ping.cpp
             src/commands/coins.cpp
             src/commands/ship.cpp

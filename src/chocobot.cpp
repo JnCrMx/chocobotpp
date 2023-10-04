@@ -67,7 +67,15 @@ void chocobot::init()
             co_return;
 
         auto& cmd = command_factory::get_map()->at(command);
+
+        bool preflight = co_await cmd->preflight(*this, *connection, m_db, m_bot, guild, event, iss);
+        if(!preflight) {
+            spdlog::log(spdlog::level::info, "Prelight of command {} (\"{}\") from user {} in guild failed.",
+                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
+            co_return;
+        }
         command::result result = co_await cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
+
         spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);
     });

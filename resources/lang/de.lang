@@ -13,6 +13,7 @@ command.error.timeout={}, bitte warte etwas, bevor du weitere Befehle sendest!
 command.error.channel={}, schreibe deine Befehle bitte in {}!
 
 command.paid.help_cost=(Kosten: {} @{coins})
+command.paid.tax={}, du hast {} @{coins} aufgrund von Steuern ({:.1f}%) erhalten.
 command.pair.error.not_enough=Du hast nicht genug @{coins}, um diesen Befehl auszuführen!\nDie Kosten betragen {} @{coins}.
 
 command.game.usage={cmd} : {help}

@@ -23,11 +23,15 @@ struct config
     };
     std::unordered_map<std::string, command_tax> taxes;
 
-    config(nlohmann::json j) : 
+    std::string fortunes_directory;
+
+    config(nlohmann::json j) :
         token(j["token"]),
         db_uri(j["database"]),
         bugreport_command(j.value("bugreport", "false")),
         api_port(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("port", 8080)),
+        api_address(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("address", "")),
+        fortunes_directory(j.value("fortunes_directory", std::string{}))
     {
         double tax_rate = j.value("tax_rate", branding::default_tax_rate);
         for(const auto& [key, value] : j["taxes"].items())

@@ -42,6 +42,7 @@ command.shop.help=Shop, in dem du Rollen (z.B. Farbrollen) für @{coins} kaufen 
 command.stats.help=Zeigt Statistiken über den Server an.
 command.block.help=Öffne einen ?-Block.
 command.slot-machine.help=Spiele an einer Slot-Maschine.
+command.glückskeks.help=Öffne einen Glückskeks.
 
 command.coins.usage={cmd} : {help}\n{cmd} <Nutzer> @{opcmd} : Zeige die @{coins} eines anderen Nutzers an.
 command.daily.usage={cmd} : {help}
@@ -66,6 +67,7 @@ command.shop.usage={cmd} : Zeige alle verfügbaren Rollen an.\n{cmd} i(nventory)
 command.stats.usage={cmd} : {help}
 command.block.usage={cmd} : {help}
 command.slot-machine.usage={cmd} : {help}
+command.glückskeks.usage={cmd} : {help}
 
 command.coins.error.perm=Du darfst dir nicht die @{coins} anderer Nutzer anzeigen lassen!
 command.coins.title=@{coinmoji} @{coins} @{coinmoji}

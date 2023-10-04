@@ -67,7 +67,7 @@ class shop_command : public command
                     co_return command::result::user_error;
                 }
 
-                if(db.get_coins(user_id, guild.id, txn) < cost) {
+                if(db.get_coins(user_id, guild.id, txn).value_or(0) < cost) {
                     event.reply(utils::build_error(txn, guild, "command.shop.error.buy.not_enough"));
                     co_return command::result::user_error;
                 }

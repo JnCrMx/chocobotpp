@@ -3,7 +3,6 @@
 #include "branding.hpp"
 
 #include <random>
-#include <ranges>
 
 namespace chocobot {
 
@@ -148,7 +147,7 @@ class quiz : public multi_player_game
                 spdlog::error("Cannot load questions for game \"{}\": File \"{}\" not found or not readable.", name, path);
                 return;
             }
-            
+
             quiz_question qq{};
             std::getline(quiz, qq.question);
             if(qq.question.empty())

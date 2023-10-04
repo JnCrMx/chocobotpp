@@ -123,10 +123,6 @@ if(USE_INSTALLED_DPP) # DPP doesn't properly export include directories nor libr
   target_link_libraries(chocobot PUBLIC crypto ssl)
 endif(USE_INSTALLED_DPP)
 
-set_target_properties(chocobot PROPERTIES
-  CXX_STANDARD 23
-  CXX_STANDARD_REQUIRED ON
-)
 target_compile_features(chocobot PUBLIC cxx_std_23)
 
 add_custom_target(copy_assets

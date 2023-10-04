@@ -223,7 +223,7 @@ boost::asio::awaitable<void> api::get_self_user(Res res, Req req)
 
     dpp::guild_member member = co_await awaitable<dpp::guild_member>(&dpp::cluster::guild_get_member, &m_chocobot->m_bot, guild_id, user);
     dpp::user member_user = co_await awaitable<dpp::user_identified>(&dpp::cluster::user_get_cached, &m_chocobot->m_bot, user);
-    
+
     nlohmann::json j{};
     j["userId"] = std::to_string(user);
     j["tag"] = member_user.format_username();

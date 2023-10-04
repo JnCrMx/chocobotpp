@@ -1,4 +1,5 @@
 #include "command.hpp"
+#include "paid_command.hpp"
 
 #include <utils.hpp>
 #include <i18n.hpp>
@@ -31,9 +32,13 @@ class help_command : public command
                 dpp::embed eb{};
                 eb.set_title(i18n::translate(txn, guild, "command.help.title"));
                 eb.set_color(branding::colors::cookie);
-                for(const auto& [key, _] : map)
+                for(const auto& [key, command] : map)
                 {
-                    eb.add_field(guild.prefix + key, i18n::translate(txn, guild, "command."+key+".help"));
+                    std::string description = i18n::translate(txn, guild, "command."+key+".help");
+                    if(paid_command* paid = dynamic_cast<paid_command*>(command.get())) {
+                        description = description+" "+i18n::translate(txn, guild, "command.paid.help_cost", paid->get_cost());
+                    }
+                    eb.add_field(guild.prefix + key, description);
                 }
                 event.reply(dpp::message{dpp::snowflake{}, eb});
 
@@ -51,6 +56,9 @@ class help_command : public command
                     co_return result::user_error;
                 }
                 auto helpText = i18n::translate(txn, guild, "command."+command+".help");
+                if(paid_command* paid = dynamic_cast<paid_command*>(map.at(command).get())) {
+                    helpText = helpText+" "+i18n::translate(txn, guild, "command.paid.help_cost", paid->get_cost());
+                }
                 event.reply(i18n::translate(txn, guild, "command."+command+".usage",
                     fmt::arg("prefix", guild.prefix),
                     fmt::arg("cmd", guild.prefix+command),

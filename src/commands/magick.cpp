@@ -61,7 +61,20 @@ class magick_command : public paid_command
                     event.reply(dpp::message({}, embed));
                     continue;
                 }
-                operations[keyword](image, iss, event);
+                try
+                {
+                    operations[keyword](image, iss, event);
+                }
+                catch(const std::exception& ex)
+                {
+                    pqxx::nontransaction txn{conn};
+                    dpp::embed embed{};
+                    embed.set_title(i18n::translate(txn, guild, "error"));
+                    embed.set_color(branding::colors::error);
+                    embed.set_description(i18n::translate(txn, guild, "command.magick.error.operation_failed", operation, ex.what()));
+                    event.reply(dpp::message({}, embed));
+                    continue;
+                }
             }
 
             {
@@ -81,11 +94,18 @@ command_register<magick_command> magick_command::reg{};
 void read_args_and_call(auto func, std::istringstream& iss, auto... defaults)
 {
     auto read_one = [&](auto& x){
-        std::remove_cvref_t<decltype(x)> v = x;
+        using type = std::remove_cvref_t<decltype(x)>;
+        type v = x;
         bool ok = false;
-        if constexpr (std::is_same_v<decltype(v), std::string>) {
+        if constexpr (std::is_same_v<type, std::string>) {
             ok = static_cast<bool>(iss >> std::quoted(v));
-        } else {
+        }
+        else if constexpr(std::is_enum_v<type>){
+            std::underlying_type_t<type> vv;
+            ok = static_cast<bool>(iss >> vv);
+            v = static_cast<type>(vv);
+        }
+        else {
             ok = static_cast<bool>(iss >> v);
         }
         if(ok) {
@@ -114,10 +134,10 @@ std::unordered_map<std::string, magick_command::magick_operation> magick_command
     ARG_OP(oilPaint, 3.0),
     ARG_OP(polaroid, std::string{}, 0.0),
     ARG_OP(posterize, 16, false),
-#elif MagickLibInterface == 6
+#elif MagickLibInterface == 10
     ARG_OP(oilPaint, 0.0, 1.0),
-    ARG_OP(polaroid, std::string{}, 0.0, PixelInterpolateMethod{}),
-    ARG_OP(posterize, 16, DitherMethod{}),
+    ARG_OP(polaroid, std::string{}, 0.0, Magick::NearestInterpolatePixel),
+    ARG_OP(posterize, 16, Magick::NoDitherMethod),
 #endif
     ARG_OP(negate, false),
     BASIC_OP(normalize),

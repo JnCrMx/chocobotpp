@@ -292,6 +292,7 @@ command.stats.entry.emojis.normal=normale Emojis
 command.stats.entry.emojis.animated=animierte Emojis
 
 command.magick.error.unknown_operation=Unbekannte Operation: {}
+command.magick.error.operation_failed=Operation "{}" ist fehlgeschlagen:\n{}
 
 subscription.subscribe.error.empty=Bitte gebe ein Schlüsselwort an!
 subscription.subscribe.error.dup=Du hast dieses Schlüsselwort bereits abonniert.

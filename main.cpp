@@ -1,6 +1,7 @@
 #include <fstream>
 #include <spdlog/spdlog.h>
 #include <spdlog/cfg/env.h>
+#include <Magick++.h>
 
 #include "config.hpp"
 #include "chocobot.hpp"
@@ -71,6 +72,8 @@ int main(int argc, const char** argv)
 
     spdlog::info("Starting ChocoBot...");
     spdlog::debug("Using config {}", configFile);
+
+    Magick::InitializeMagick(argv[0]);
 
     chocobot::config config{};
     {

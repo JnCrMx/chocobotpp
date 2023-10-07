@@ -33,11 +33,15 @@ class magick_command : public paid_command
         {
             bool use_attachment = !event.msg.attachments.empty() && event.msg.attachments.front().size <= max_size;
             std::string url = use_attachment ? event.msg.attachments.front().url: event.msg.author.get_avatar_url();
-            auto res = co_await discord.co_request(url, dpp::http_method::m_get);
-            const auto& img = res.body;
-            Magick::Blob blob{img.data(), img.size()};
+
             Magick::Image image{};
-            image.read(blob);
+
+            {
+                auto res = co_await discord.co_request(url, dpp::http_method::m_get);
+                const auto& img = res.body;
+                Magick::Blob inBlob{img.data(), img.size()};
+                image.read(inBlob);
+            }
 
             std::string operation;
             while(args >> std::quoted(operation))
@@ -60,10 +64,13 @@ class magick_command : public paid_command
                 operations[keyword](image, iss, event);
             }
 
-            image.write(&blob, "png");
+            {
+                Magick::Blob outBlob{};
+                image.write(&outBlob, "PNG");
 
-            event.reply(dpp::message{}
-                .add_file("image.png", std::string(reinterpret_cast<const char*>(blob.data()), blob.length())));
+                event.reply(dpp::message{}
+                    .add_file("image.png", std::string(reinterpret_cast<const char*>(outBlob.data()), outBlob.length())));
+            }
             co_return result::success;
         }
     private:

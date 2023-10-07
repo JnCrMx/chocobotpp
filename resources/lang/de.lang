@@ -46,6 +46,7 @@ command.slot-machine.help=Spiele an einer Slot-Maschine.
 command.noop.help=Tues rein gar nichts.
 command.ping.help=Gebe den Ping vom Bot zu Discord zurück.
 command.glückskeks.help=Öffne einen Glückskeks.
+command.magick.help=Bearbeite ein Bild.
 
 command.coins.usage={cmd} : {help}\n{cmd} <Nutzer> @{opcmd} : Zeige die @{coins} eines anderen Nutzers an.
 command.daily.usage={cmd} : {help}
@@ -73,6 +74,7 @@ command.slot-machine.usage={cmd} : {help}
 command.noop.usage={cmd} : {help}
 command.ping.usage={cmd} : {help}\n{cmd} <Zahl> : Warte <Zahl> Sekunden bevor der Ping zurückgegeben wird.
 command.glückskeks.usage={cmd} : {help}
+command.magick.usage={cmd} <Operationen...>: {help}
 
 command.coins.error.perm=Du darfst dir nicht die @{coins} anderer Nutzer anzeigen lassen!
 command.coins.title=@{coinmoji} @{coins} @{coinmoji}
@@ -288,6 +290,8 @@ command.stats.entry.boost_level=Boost-Level
 command.stats.entry.boosts=Boosts
 command.stats.entry.emojis.normal=normale Emojis
 command.stats.entry.emojis.animated=animierte Emojis
+
+command.magick.error.unknown_operation=Unbekannte Operation: {}
 
 subscription.subscribe.error.empty=Bitte gebe ein Schlüsselwort an!
 subscription.subscribe.error.dup=Du hast dieses Schlüsselwort bereits abonniert.

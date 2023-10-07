@@ -88,6 +88,7 @@ set(SOURCES main.cpp
             src/commands/mystats.cpp
             src/commands/shop.cpp
             src/commands/fortune.cpp
+            src/commands/magick.cpp
             src/games/slot-machine.cpp
             src/games/who-is-it.cpp
             src/games/quiz.cpp)

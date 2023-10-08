@@ -49,11 +49,21 @@ class magick_command : public paid_command
 
             Magick::Image image{};
 
+            try
             {
                 auto res = co_await discord.co_request(url, dpp::http_method::m_get);
                 const auto& img = res.body;
                 Magick::Blob inBlob{img.data(), img.size()};
                 image.read(inBlob);
+            }
+            catch(const std::exception& ex) {
+                pqxx::nontransaction txn{conn};
+                dpp::embed embed{};
+                embed.set_title(i18n::translate(txn, guild, "error"));
+                embed.set_color(branding::colors::error);
+                embed.set_description(i18n::translate(txn, guild, "command.magick.error.read", url, ex.what()));
+                event.reply(dpp::message({}, embed));
+                co_return result::system_error;
             }
 
             std::string operation;

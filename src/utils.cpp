@@ -56,7 +56,7 @@ std::optional<dpp::snowflake> parse_mention(const std::string &mention)
     return flake;
 }
 
-std::string solve_mentions(const std::string &string, 
+std::string solve_mentions(const std::string &string,
     std::function<std::string(const dpp::user&)> to_string, const std::string& fallback,
     std::function<std::optional<dpp::user>(dpp::snowflake)> getter)
 {
@@ -86,6 +86,16 @@ void replaceAll(std::string &str, const std::string &from, const std::string &to
         str.replace(start_pos, from.length(), to);
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
+}
+
+std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size)
+{
+    std::string avatar_url = dpp::utility::cdn_endpoint_url_hash({ dpp::image_type::i_jpg, dpp::image_type::i_png, dpp::image_type::i_webp, dpp::image_type::i_gif },
+        "guilds/" + std::to_string(member.guild_id) + "/users/" + std::to_string(member.user_id) + "/avatars/", member.avatar.to_string(),
+        dpp::image_type::i_png, size, false, member.has_animated_guild_avatar());
+    if(!avatar_url.empty())
+        return avatar_url;
+    return user.get_avatar_url(size, dpp::image_type::i_png, false);
 }
 
 }

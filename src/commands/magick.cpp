@@ -2,6 +2,7 @@
 
 #include "chocobot.hpp"
 #include "i18n.hpp"
+#include "utils.hpp"
 
 #include <Magick++.h>
 #include <fmt/ranges.h>
@@ -15,17 +16,6 @@ class magick_command : public paid_command
         static std::unordered_map<std::string, magick_operation> operations;
 
         static constexpr std::size_t max_size = 1024*1024;
-
-        static constexpr int default_avatar_size = 256;
-        std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size = default_avatar_size)
-        {
-            std::string avatar_url = member.get_avatar_url(size);
-            if(!avatar_url.empty())
-                return avatar_url;
-            if(!user.avatar.to_string().empty())
-                return user.get_avatar_url(size);
-            return user.get_default_avatar_url();
-        }
     public:
         magick_command() {}
 
@@ -55,7 +45,7 @@ class magick_command : public paid_command
                     co_return result::user_error;
                 }
             }
-            std::string url = use_attachment ? event.msg.attachments.front().url : get_effective_avatar_url(event.msg.member, event.msg.author);
+            std::string url = use_attachment ? event.msg.attachments.front().url : utils::get_effective_avatar_url(event.msg.member, event.msg.author);
 
             Magick::Image image{};
 

@@ -18,7 +18,7 @@ dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const 
 dpp::message build_error(pqxx::connection& db, const guild& guild, const std::string& key);
 
 std::optional<dpp::snowflake> parse_mention(const std::string& mention);
-std::string solve_mentions(const std::string& string, 
+std::string solve_mentions(const std::string& string,
     std::function<std::string(const dpp::user&)> to_string = &dpp::user::format_username,
     const std::string& fallback = "unknown user",
     std::function<std::optional<dpp::user>(dpp::snowflake)> getter = [](dpp::snowflake s){
@@ -28,5 +28,8 @@ std::string solve_mentions(const std::string& string,
     });
 
 void replaceAll(std::string& str, const std::string& from, const std::string& to);
+
+static constexpr int default_avatar_size = 256;
+std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size = default_avatar_size);
 
 }

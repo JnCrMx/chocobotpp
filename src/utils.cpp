@@ -90,12 +90,17 @@ void replaceAll(std::string &str, const std::string &from, const std::string &to
 
 std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size)
 {
-    std::string avatar_url = dpp::utility::cdn_endpoint_url_hash({ dpp::image_type::i_jpg, dpp::image_type::i_png, dpp::image_type::i_webp, dpp::image_type::i_gif },
-        "guilds/" + std::to_string(member.guild_id) + "/users/" + std::to_string(member.user_id) + "/avatars/", member.avatar.to_string(),
-        dpp::image_type::i_png, size, false, member.has_animated_guild_avatar());
-    if(!avatar_url.empty())
-        return avatar_url;
-    return user.get_avatar_url(size, dpp::image_type::i_png, false);
+    auto url = [&](){
+        if(!member.avatar.to_string().empty()) {
+            return dpp::utility::cdn_endpoint_url_hash({ dpp::image_type::i_jpg, dpp::image_type::i_png, dpp::image_type::i_webp, dpp::image_type::i_gif },
+                "guilds/" + std::to_string(member.guild_id) + "/users/" + std::to_string(member.user_id) + "/avatars/", member.avatar.to_string(),
+                dpp::image_type::i_png, size, false, member.has_animated_guild_avatar());
+        }
+        return user.get_avatar_url(size, dpp::image_type::i_png, false);
+    }();
+    spdlog::trace("Resolved avatar for user {} ({}) in guild {} to URL \"{}\"",
+        user.format_username(), user.id, member.guild_id, url);
+    return url;
 }
 
 }

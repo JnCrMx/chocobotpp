@@ -68,14 +68,32 @@ void chocobot::init()
 
         auto& cmd = command_factory::get_map()->at(command);
 
-        bool preflight = co_await cmd->preflight(*this, *connection, m_db, m_bot, guild, event, iss);
-        if(!preflight) {
-            spdlog::log(spdlog::level::info, "Prelight of command {} (\"{}\") from user {} in guild failed.",
-                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
-            co_return;
+        try{
+            bool preflight = co_await cmd->preflight(*this, *connection, m_db, m_bot, guild, event, iss);
+            if(!preflight) {
+                spdlog::log(spdlog::level::info, "Preflight of command {} (\"{}\") from user {} in guild {} failed.",
+                    command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
+                co_return;
+            }
+        } catch(const std::exception& ex) {
+            spdlog::log(spdlog::level::err, "Preflight of command {} (\"{}\") from user {} in guild {} threw: {}",
+                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, ex.what());
         }
-        command::result result = co_await cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
-        co_await cmd->postexecute(*this, *connection, m_db, m_bot, guild, event, iss, result);
+
+        command::result result = command::result::system_error;
+        try {
+            result = co_await cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
+        } catch(const std::exception& ex) {
+            spdlog::log(spdlog::level::err, "Command {} (\"{}\") from user {} in guild {} threw: {}",
+                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, ex.what());
+        }
+
+        try {
+            co_await cmd->postexecute(*this, *connection, m_db, m_bot, guild, event, iss, result);
+        } catch(const std::exception& ex) {
+            spdlog::log(spdlog::level::err, "Postexecute of command {} (\"{}\") from user {} in guild {} threw: {}",
+                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, ex.what());
+        }
 
         spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);

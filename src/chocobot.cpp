@@ -75,6 +75,7 @@ void chocobot::init()
             co_return;
         }
         command::result result = co_await cmd->execute(*this, *connection, m_db, m_bot, guild, event, iss);
+        co_await cmd->postexecute(*this, *connection, m_db, m_bot, guild, event, iss, result);
 
         spdlog::log(command::result_level(result), "Command {} (\"{}\") from user {} in guild {} returned {}.",
             command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id, result);

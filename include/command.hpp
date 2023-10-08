@@ -54,6 +54,10 @@ class command
             co_return true;
         }
         virtual dpp::coroutine<result> execute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) = 0;
+        virtual dpp::coroutine<> postexecute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&, result) {
+            co_return;
+        }
+
         virtual std::string get_name() = 0;
         virtual void prepare(chocobot&, database&) {}
         virtual ~command() {}

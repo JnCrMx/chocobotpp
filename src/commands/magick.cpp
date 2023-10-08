@@ -15,6 +15,17 @@ class magick_command : public paid_command
         static std::unordered_map<std::string, magick_operation> operations;
 
         static constexpr std::size_t max_size = 1024*1024;
+
+        static constexpr int default_avatar_size = 256;
+        std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size = default_avatar_size)
+        {
+            std::string avatar_url = member.get_avatar_url(size);
+            if(!avatar_url.empty())
+                return avatar_url;
+            if(!user.avatar.to_string().empty())
+                return user.get_avatar_url(size);
+            return user.get_default_avatar_url();
+        }
     public:
         magick_command() {}
 
@@ -31,8 +42,20 @@ class magick_command : public paid_command
             dpp::cluster& discord, const guild& guild,
             const dpp::message_create_t& event, std::istream& args) override
         {
-            bool use_attachment = !event.msg.attachments.empty() && event.msg.attachments.front().size <= max_size;
-            std::string url = use_attachment ? event.msg.attachments.front().url: event.msg.author.get_avatar_url();
+            bool use_attachment = !event.msg.attachments.empty();
+            if(use_attachment) {
+                auto size = event.msg.attachments.front().size;
+                if(size > max_size) {
+                    pqxx::nontransaction txn{conn};
+                    dpp::embed embed{};
+                    embed.set_title(i18n::translate(txn, guild, "error"));
+                    embed.set_color(branding::colors::error);
+                    embed.set_description(i18n::translate(txn, guild, "command.magick.error.size", size, max_size));
+                    event.reply(dpp::message({}, embed));
+                    co_return result::user_error;
+                }
+            }
+            std::string url = use_attachment ? event.msg.attachments.front().url : get_effective_avatar_url(event.msg.member, event.msg.author);
 
             Magick::Image image{};
 

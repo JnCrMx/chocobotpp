@@ -295,6 +295,8 @@ command.magick.error.unknown_operation=Unbekannte Operation: {}
 command.magick.error.operation_failed=Operation "{}" ist fehlgeschlagen:\n{}
 command.magick.error.size=Die angehängte Datei ist zu groß: {} Bytes > {} Bytes
 command.magick.error.read=Ich konnte das Bild leider nicht von der URL \"{}\" laden: {}
+command.magick.subhelp.title=## Operationen:
+command.magick.subhelp.line=- {}
 
 subscription.subscribe.error.empty=Bitte gebe ein Schlüsselwort an!
 subscription.subscribe.error.dup=Du hast dieses Schlüsselwort bereits abonniert.

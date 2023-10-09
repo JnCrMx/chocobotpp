@@ -69,6 +69,17 @@ class magick_command : public paid_command
             std::string operation;
             while(args >> std::quoted(operation))
             {
+                if(operation == "help") {
+                    pqxx::nontransaction txn{conn};
+                    std::string message = i18n::translate(txn, guild, "command.magick.subhelp.title");
+                    for(const auto& [k, _] : magick_command::operations)
+                    {
+                        message += '\n' + i18n::translate(txn, guild, "command.magick.subhelp.line", k);
+                    }
+                    event.reply(message);
+                    co_return result::user_error; // prevent costing coins in this case
+                }
+
                 if(operation.ends_with(")"))
                     operation.erase(operation.size()-1);
                 std::istringstream iss(operation);
@@ -82,7 +93,7 @@ class magick_command : public paid_command
                     embed.set_color(branding::colors::error);
                     embed.set_description(i18n::translate(txn, guild, "command.magick.error.unknown_operation", keyword));
                     event.reply(dpp::message({}, embed));
-                    continue;
+                    co_return result::user_error;
                 }
                 try
                 {
@@ -96,7 +107,7 @@ class magick_command : public paid_command
                     embed.set_color(branding::colors::error);
                     embed.set_description(i18n::translate(txn, guild, "command.magick.error.operation_failed", operation, ex.what()));
                     event.reply(dpp::message({}, embed));
-                    continue;
+                    co_return result::system_error;
                 }
             }
 
@@ -145,14 +156,6 @@ void read_args_and_call(auto func, std::istringstream& iss, auto... defaults)
 }}
 
 std::unordered_map<std::string, magick_command::magick_operation> magick_command::operations = {
-    {"help", [](auto&, auto&, const dpp::message_create_t& event){
-        std::string message = "## Operations:";
-        for(const auto& [k, _] : magick_command::operations)
-        {
-            message += "\n- " + k;
-        }
-        event.reply(message);
-    }},
 #if MagickLibInterface == 6
     ARG_OP(oilPaint, 3.0),
     ARG_OP(polaroid, std::string{}, 0.0),

@@ -58,7 +58,7 @@ namespace chocobot {
             database* m_db;
             std::unique_ptr<pqxx::connection> m_connection;
         public:
-        connection_wrapper(database* db, std::unique_ptr<pqxx::connection>&& connection) : 
+        connection_wrapper(database* db, std::unique_ptr<pqxx::connection>&& connection) :
             m_db(db),
             m_connection(std::move(connection))
         {
@@ -96,7 +96,7 @@ namespace chocobot {
             }
 
             template<typename F>
-            static auto work(F consumer, pqxx::connection& connection) -> 
+            static auto work(F consumer, pqxx::connection& connection) ->
                 std::enable_if_t<std::is_same_v<decltype(consumer(std::declval<pqxx::transaction_base&>())), void>, void>
             {
                 pqxx::work work(connection);
@@ -115,6 +115,8 @@ namespace chocobot {
             void set_stat(dpp::snowflake user, dpp::snowflake guild, std::string stat, int value, pqxx::transaction_base& tx);
 
             std::optional<guild> get_guild(dpp::snowflake guild, pqxx::transaction_base& tx);
+
+            std::optional<std::string> get_custom_command(dpp::snowflake guild, const std::string& keyword, pqxx::transaction_base& tx);
 
             connection_wrapper acquire_connection();
             void return_connection(std::unique_ptr<pqxx::connection>&&);

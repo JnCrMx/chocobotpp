@@ -9,10 +9,37 @@
 #include "chocobot.hpp"
 #include "command.hpp"
 #include "i18n.hpp"
+#include "utils.hpp"
 
 namespace chocobot {
 
 command_factory::map_type* command_factory::map = nullptr;
+
+static void replace_member(std::string& str, const std::string& param, const dpp::user& user, const dpp::guild_member& member)
+{
+    const auto& effective_name = member.nickname.empty() ? user.global_name : member.nickname;
+    utils::replaceAll(str, "$"+param+".id", user.id.str());
+    utils::replaceAll(str, "$"+param+".name", user.format_username());
+    utils::replaceAll(str, "$"+param+".displayname", effective_name);
+    utils::replaceAll(str, "$"+param+".ping", user.get_mention());
+    utils::replaceAll(str, "$"+param+".avatar", user.get_avatar_url());
+    utils::replaceAll(str, "$"+param, effective_name);
+}
+
+static std::string format_custom_command(const std::string& fmt, const dpp::message_create_t& event)
+{
+    std::string text = fmt;
+    replace_member(text, "self", event.msg.author, event.msg.member);
+    replace_member(text, "sender", event.msg.author, event.msg.member);
+    replace_member(text, "0", event.msg.author, event.msg.member);
+
+    const auto& mentions = event.msg.mentions;
+    for(int i=0; i<mentions.size(); i++) {
+        const auto& [user, member] = mentions.at(i);
+        replace_member(text, std::to_string(i+1), user, member);
+    }
+    return text;
+}
 
 void chocobot::init()
 {
@@ -63,6 +90,14 @@ void chocobot::init()
             co_return;
 
         command = command.substr(guild.prefix.size());
+
+        if(auto opt = database::work(std::bind_front(&database::get_custom_command, &m_db, event.msg.guild_id, command), *connection)) {
+            spdlog::log(command::result_level(command::result::success), "Running custom command {} (\"{}\") from user {} in guild {}.",
+                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
+            event.reply(format_custom_command(*opt, event));
+            co_return;
+        }
+
         if(!command_factory::get_map()->contains(command))
             co_return;
 

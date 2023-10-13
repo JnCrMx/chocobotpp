@@ -20,7 +20,8 @@ void database::prepare()
         conn->prepare("set_stat", "INSERT INTO user_stats(uid, guild, stat, value) VALUES($1, $2, $3, $4) ON CONFLICT (uid, guild, stat) DO UPDATE SET value=$4");
         conn->prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone FROM guilds WHERE id=$1");
         conn->prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
-    }   
+        conn->prepare("get_custom_command", "SELECT message FROM custom_commands WHERE guild=$1 AND keyword=$2");
+    }
 }
 
 connection_wrapper database::acquire_connection()
@@ -33,7 +34,7 @@ connection_wrapper database::acquire_connection()
 
     auto conn = std::move(m_connections.front());
     m_connections.pop_front();
-    
+
     spdlog::trace("Acquire connnection {} for thread {}", conn->get_var("application_name"), std::hash<std::thread::id>{}(std::this_thread::get_id()));
 
     return connection_wrapper(this, std::move(conn));
@@ -115,6 +116,13 @@ std::optional<guild> database::get_guild(dpp::snowflake guild, pqxx::transaction
         id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone
     };
     return g;
+}
+
+std::optional<std::string> database::get_custom_command(dpp::snowflake guild, const std::string& keyword, pqxx::transaction_base& tx)
+{
+    auto res = tx.exec_prepared("get_custom_command", guild, keyword);
+    if(res.empty()) return std::nullopt;
+    return res.front().front().as<std::string>();
 }
 
 }

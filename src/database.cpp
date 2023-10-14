@@ -21,6 +21,7 @@ void database::prepare()
         conn->prepare("get_guild", "SELECT id, prefix, command_channel, remind_channel, warning_channel, poll_channel, language, timezone FROM guilds WHERE id=$1");
         conn->prepare("get_translation", "SELECT value FROM guild_language_overrides WHERE guild=$1 AND key=$2");
         conn->prepare("get_custom_command", "SELECT message FROM custom_commands WHERE guild=$1 AND keyword=$2");
+        conn->prepare("get_command_alias", "SELECT command, arguments FROM command_aliases WHERE guild=$1 AND keyword=$2");
     }
 }
 
@@ -123,6 +124,13 @@ std::optional<std::string> database::get_custom_command(dpp::snowflake guild, co
     auto res = tx.exec_prepared("get_custom_command", guild, keyword);
     if(res.empty()) return std::nullopt;
     return res.front().front().as<std::string>();
+}
+
+std::optional<std::tuple<std::string, std::string>> database::get_command_alias(dpp::snowflake guild, const std::string& keyword, pqxx::transaction_base& tx)
+{
+    auto res = tx.exec_prepared("get_command_alias", guild, keyword);
+    if(res.empty()) return std::nullopt;
+    return res.front().as<std::string, std::string>();
 }
 
 }

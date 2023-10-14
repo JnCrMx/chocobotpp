@@ -91,6 +91,13 @@ void chocobot::init()
 
         command = command.substr(guild.prefix.size());
 
+        if(auto opt = database::work(std::bind_front(&database::get_command_alias, &m_db, event.msg.guild_id, command), *connection)) {
+            auto [new_command, args] = *opt;
+            spdlog::trace("Transformed command alias \"{}\" to \"{}\" for user {} in guild {}.",
+                command, new_command, event.msg.author.format_username(), event.msg.guild_id);
+            command = new_command;
+        }
+
         if(auto opt = database::work(std::bind_front(&database::get_custom_command, &m_db, event.msg.guild_id, command), *connection)) {
             spdlog::log(command::result_level(command::result::success), "Running custom command {} (\"{}\") from user {} in guild {}.",
                 command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);

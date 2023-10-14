@@ -117,6 +117,7 @@ namespace chocobot {
             std::optional<guild> get_guild(dpp::snowflake guild, pqxx::transaction_base& tx);
 
             std::optional<std::string> get_custom_command(dpp::snowflake guild, const std::string& keyword, pqxx::transaction_base& tx);
+            std::optional<std::tuple<std::string, std::string>> get_command_alias(dpp::snowflake guild, const std::string& keyword, pqxx::transaction_base& tx);
 
             connection_wrapper acquire_connection();
             void return_connection(std::unique_ptr<pqxx::connection>&&);

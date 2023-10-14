@@ -1,0 +1,405 @@
+error=Error
+success=Success
+
+coin=Coin
+coins=Coins
+coins-dat=Coins
+coinmoji=:moneybag:
+operator=Operator
+operators=Operators
+opcmd=(only @{operators})
+
+command.error.timeout={}, please wait a little bit before you send more commands.
+command.error.channel={}, please put your commands in {}!
+
+command.paid.help_cost=(Cost: {} @{coins})
+command.paid.tax={}, du received {} @{coins} due to taxes ({:.1f}%).
+command.pair.error.not_enough=You don't have enough @{coins}, to use this command!\nUsing it costs {} @{coins}.
+
+command.game.usage={cmd} : {help}
+command.game.help=Start the game {}.
+
+command.coins.help=Show how many @{coins} you have.
+command.daily.help=Receive your daily @{coin} bonus.
+command.gift.help=Send @{coins} to another user.
+command.unwarn.help=Remove a warning.
+command.warn.help=Warn a user.
+command.warns.help=Show the warnings of yourself or another user.
+command.bugreport.help=Send a bug report.
+command.christmas.help=Christmas Presents!
+command.credits.help=Show the credits.
+command.gif.help=Show a GIF from Tenor.
+command.help.help=Show a list of all commands or help for a specific command.
+command.keks.help=Show a cookie.
+command.leaderboard.help=Show the leaderboard.
+command.meme.help=Show a random meme from a given subreddit.
+command.mystats.help=Show your own stats.
+command.random.help=Use various randomization functions.
+command.remind.help=Create reminders for yourself or other people.
+command.say.help=Say something in a channel.
+command.ship.help=Ship two terms.
+command.shop.help=Shop, in which you can buy color roles for @{coins}.
+command.stats.help=Show stats about the current server.
+command.quiz.help=Host a quiz.
+command.block.help=Open a ?-block.
+command.slot-machine.help=Play slot machine.
+command.noop.help=Do absolutely nothing.
+command.ping.help=Return the ping of the bot.
+command.glückskeks.help=Open a fortune cookie.
+command.magick.help=Edit an image.
+
+command.coins.usage={cmd} : {help}\n{cmd} <user> @{opcmd} : Show @{coins} of a different user.
+command.daily.usage={cmd} : {help}
+command.gift.usage={cmd} <user> <amount> : {help}
+command.unwarn.usage={cmd} <warning id> @{opcmd} : {help}
+command.warn.usage={cmd} <user> <reason> @{opcmd} : {help}
+command.warns.usage={cmd} : Show your own warnings.\n{cmd} <user> @{opcmd} : Show the warnings of a different user.
+command.bugreport.usage={cmd} <title> : Send a bug report (just title).\n{cmd} <title>(new line)<text> : Send a bug report with a description.
+command.christmas.usage={cmd} : Show your own Christmas Tree.\n{cmd} <number> : Open a present.
+command.credits.usage={cmd} : {help}
+command.gif.usage={cmd} <search term> : {help}
+command.help.usage={cmd} : Show a list of all commands\n{cmd} <command> : Show usage information for a command.
+command.keks.usage={cmd} : {help}
+command.leaderboard.usage={cmd} : {help}
+command.meme.usage={cmd} <subreddit> : {help}\n{cmd} r/<subreddit> : {help}
+command.mystats.usage={cmd} : {help}
+command.random.usage={cmd} <user> [<user> ...] : Find a random user included in the given list of users.\n{cmd} <role> [<role> ...] : Find a random user having one of the given roles.\n{cmd} @everyone : Find a random user on this server.\n{cmd} <start> <end> : Return a random number in a range.\n{cmd} <word> <word> [<word> ...] : Return a random word from the given list of words.
+command.remind.usage={cmd} <time> [<reminder message>] : Remind me at a given time.\n{cmd} <duration> [<reminder message>] : Reminder me after a given duration.\n{cmd} <time> <user> [<reminder message>] : Remind a given user at a given time.\n{cmd} <duration> <user> [<reminder message>] : Remind a given user after a given duration.\n\nExample for times:\n``25.03.2020/17:42``\n``26.03/15:23``\n``18:32``\n\nExamples for durations:\n``29min``\n``1h15min``\n``1d5h12min``
+command.say.usage={cmd} <message> : Say something in this channel.\n{cmd} <channel> <message> : Say something in a given channel.
+command.ship.usage={cmd} <word> [x] <word> : Ship two given terms.\n{cmd} <user> [x] <user> : Ship two given users.
+command.shop.usage={cmd} : Show all available roles in the shop.\n{cmd} i(nventory) : Show all roles you own.\n{cmd} b(uy) <alias> : Buy a role.\n{cmd} a(ctivate) <alias> : Activate a role.\n{cmd} d(eactivate) <alias> : Deactivate a role.
+command.stats.usage={cmd} : {help}
+command.block.usage={cmd} : {help}
+command.slot-machine.usage={cmd} : {help}
+command.noop.usage={cmd} : {help}
+command.ping.usage={cmd} : {help}\n{cmd} <number> : Wait <number> seconds before returning the ping.
+command.glückskeks.usage={cmd} : {help}
+command.magick.usage={cmd} <operations>...: {help}
+
+command.coins.error.perm=You are not allowed to see the @{coins} of other users.
+command.coins.title=@{coinmoji} @{coins} @{coinmoji}
+command.coins.your=Your @{coins}
+command.coins.daily=💎 You can claim your daily bonus! 💎
+
+command.daily.error.dup=You have already claimed your daily bonus today!
+command.daily.streak_lost=You have lost your streak! 😭
+command.daily.title=@{coinmoji} @{coins} @{coinmoji}
+command.daily.message=Your received your daily bonus of {} @{coins-dat}!
+command.daily.your_coins=Your @{coins}
+command.daily.your_streak=Your streak
+command.daily.christmas_bonus=Because it's Christmas you received double the amount of coins today @{coins}! 🎄
+command.daily.christmas_save=A Christmas Angel has saved your streak! 👼
+command.daily.christmas_presents=You have unopened Christmas presents! 🎁
+command.daily.first=You are the first one on this server and therefore receive an additional bonus of {} @{coins-dat}! 🥳
+
+command.gift.title=Gift
+command.gift.message.many={} has gifted {} {} @{coins}.
+command.gift.message.one={} has gifted {} {} @{coin}.
+command.gift.thankyou=Thank you! 💝
+command.gift.error.narg=You have to tell me how many @{coins} you want to gift.
+command.gift.error.nan=I cannot understand how many @{coins} you want to gift.
+command.gift.error.who=I cannot understand who you want to gift your @{coins} to.
+command.gift.error.negative=That would be theft!
+command.gift.error.zero=You are such a cheapskate!
+command.gift.error.not_enough=You cannot gift more than you own yourself!
+
+command.secret.arch.message=I use arch btw
+command.secret.chii.message=Hideki!
+command.secret.omae.message=NANI?!
+command.secret.quit.message=:door:
+
+command.secret.warm.error.who=You have to tell me who you want to warm.
+command.secret.warm.cool.self={} is feeling cold and needs a hug!
+command.secret.warm.cool.other={} thinks that {} is really cool!
+command.secret.warm.warm.self={} needs someone to hug them and warm them up by {:.2}°C!
+command.secret.warm.warm.other={} hugs {} und warms them up by {:.2}°C :revolving_hearts:
+command.secret.warm.hot.self=Don't touch the stove, {}, it is very hot: {:.2}°C :fire:
+command.secret.warm.hot.other={} thinks that {} is ultra hot! :fire:
+
+secret.mirror.infinity=∞x mirror
+secret.mirror.pattern=(|(\d*)x )mirror
+secret.mirror.message={}x mirror
+secret.mirror.kick=Don't you dare exploit this bot!
+secret.mirror.kick.fail=I cannot kick you, but I can reset your @{coins} and streak! >:(
+
+command.unwarn.error.narg=You need to tell me the id of the warning.
+command.unwarn.error.perm=You are not allowed to remove warnings.
+command.unwarn.error.fmt=I cannot understand the id.
+command.unwarn.error.noent=I cannot find this warning.
+command.unwarn.title=@{success}
+command.unwarn.message=Warning removed successfully!
+
+command.warn.error.perm=You are not allowed to warn people!
+command.warn.error.narg=You need to tell me who you want to warn and why!
+command.warn.error.who=You need to tell me who you want to warn!
+command.warn.title=Warning
+command.warn.warned=to
+command.warn.warner=from
+command.warn.reason=reason
+
+command.warns.error.perm=You may only see your own warnings.
+command.warns.error.who=I don't know who you want to see the warnings of.
+command.warns.title=Warnings of {}
+command.warns.warn.plain=[{}]
+command.warns.warn.operator=[{}] of {}
+command.warns.message=**{}** warnings:
+
+command.bugreport.error.general=There was an error while sending the bug report.
+command.bugreport.error.empty=Tell me what went wrong at least.
+command.bugreport.error.unsupported=Sending bug reports is not supported.
+command.bugreport.title=Bug report
+command.bugreport.message.issue=The issue was created successfully:\n{}
+command.bugreport.message=Your bug report was sent!
+
+command.christmas.error.early=It is still too early :P
+command.christmas.error.general=Internal error!
+command.christmas.error.opened=This present has already been opened!
+command.christmas.error.noent=I cannot find this present.
+command.christmas.error.fmt=I cannot understand which present you want to open.
+command.christmas.error.narg=I cannot understand what you want to do.
+command.christmas.bot_message=Merry Christmas from the ChocoBot!
+command.christmas.title=Merry Christmas!
+command.christmas.message={} gifts you {} @{coins}!
+
+command.credits.title={}
+command.credits.dedication=for
+command.credits.event=for
+command.credits.version=version
+
+command.gif.error.noent=I could not find a matching GIF.
+
+command.help.error.noent=I could not find this command.
+command.help.title=Commands
+
+command.leaderboard.title=Leaderboard
+command.leaderboard.entry.current_coins=current @{coins} 💰
+command.leaderboard.entry.max_coins=max @{coins} 💰
+command.leaderboard.entry.current_streak=current Streak 💎
+command.leaderboard.entry.max_streak=max Streak 💎
+command.leaderboard.entry.quiz.sponsored=Quiz hosted 📯
+command.leaderboard.entry.quiz.played=Quiz played 🎮
+command.leaderboard.entry.quiz.won=Quiz won 🏅
+command.leaderboard.entry.quiz.1st=Quiz won as no 1 🥇
+command.leaderboard.entry.quiz.2nd=Quiz was as no 2 🥈
+command.leaderboard.entry.quiz.3rd=Quiz was as no 3 🥉
+command.leaderboard.entry.geschenke.sponsored=Geschenke hosted 📯
+command.leaderboard.entry.geschenke.played=Geschenke played 🎮
+command.leaderboard.entry.geschenke.collected=Geschenke collected 🎁
+command.leaderboard.entry.block.played=Block played 🎮
+command.leaderboard.entry.block.1000=1000 @{coins} won 💸
+command.leaderboard.entry.block.-250=250 @{coins} lost 😈
+command.leaderboard.entry.weristes.sponsored=Wer ist es? hosted
+command.leaderboard.entry.weristes.played=Wer ist es? played 🔍
+command.leaderboard.entry.weristes.won=Wer ist es? won
+
+command.meme.error.narg=You need to tell me where I should take the meme from.
+command.meme.error.internal=I cannot access this subreddit.
+command.meme.error.noent=I cannot find any meme.
+
+command.mystats.title=Stats
+command.mystats.entry.max_coins=max @{coins} 💰
+command.mystats.entry.daily.max_streak=max Streak 💎
+command.mystats.entry.game.quiz.sponsored=Quiz hosted 📯
+command.mystats.entry.game.quiz.played=Quiz played 🎮
+command.mystats.entry.game.quiz.won=Quiz won 🏅
+command.mystats.entry.game.quiz.won.place.1=Quiz won as no 1 🥇
+command.mystats.entry.game.quiz.won.place.2=Quiz won as no 2 🥈
+command.mystats.entry.game.quiz.won.place.3=Quiz won as no 3 🥉
+command.mystats.entry.game.geschenke.sponsored=Geschenke hosted 📯
+command.mystats.entry.game.geschenke.played=Geschenke played 🎮
+command.mystats.entry.game.geschenke.collected=Geschenke collected 🎁
+command.mystats.entry.game.block.played=Block played 🎮
+command.mystats.entry.game.block.prize.1000=+1000 💸
+command.mystats.entry.game.block.prize.500=+500
+command.mystats.entry.game.block.prize.100=+100
+command.mystats.entry.game.block.prize.0=+/-0
+command.mystats.entry.game.block.prize.-20=-20
+command.mystats.entry.game.block.prize.-100=-100
+command.mystats.entry.game.block.prize.-250=-250 😈
+command.mystats.entry.game.weristes.played=Wer ist es? played 🔍
+command.mystats.entry.game.weristes.sponsored=Wer ist es? hosted
+command.mystats.entry.game.weristes.won=Wer ist es? won
+
+command.random.error.perm=No, I won't do that.
+command.random.error.unsupported=This type of randomness is not supported.
+command.random.user=It is: {}
+command.random.number=It is {}!
+command.random.word=It is: {}
+
+command.remind.error.narg1=You need to give me a time or duration for the reminder.
+command.remind.error.narg2=You need to give me a time or duration for the reminder.
+command.remind.error.fmt=I cannot understand this time/duration. See this usage of this command for examples.
+command.remind.error.past=You would need a time machine for that.
+command.remind.error.perm=Forget it.
+command.remind.error.cost=You don't have enough @{coins} to pay for this reminder.
+command.remind.error.noent=I could not find this user.
+command.remind.error.length=Your reminder message is too long.
+command.remind.self=You will be reminded {0:on %F at %T}!
+command.remind.self.cost=You will be reminded {0:on %F at %T}! Because you set so many reminders, this one cost you {} @{coins}.
+command.remind.other={1} will be reminded {0:on %F at %T}!
+command.remind.other.cost={1} will be reminded {0:on %F at %T}! Because you set so many reminders, this one cost you {} @{coins}.
+
+command.say.error.server=You are not on that server.
+command.say.error.channel_perm=You cannot send messages in that channel
+command.say.error.mention=I won't mention anyone on your behalf.
+
+command.ship.error.roles=You cannot ship roles.
+command.ship.error.many=That would be an orgy.
+command.ship.error.narg=You need to give me two terms to ship.
+command.ship.error.self="{}" seems to love themselves a lot.
+
+command.shop.error.internal=An error occurred.
+command.shop.error.buy.dup=You already own this role.
+command.shop.error.buy.noent=I cannot find that role.
+command.shop.error.buy.not_enough=You do not have enough @{coins} to buy this role.
+command.shop.error.activate.noent=I cannot find that role.
+command.shop.error.activate.dup=You have already activated this role.
+command.shop.error.activate.not_owned=You do not own this role.
+command.shop.error.deactivate.noent=I cannot find that role.
+command.shop.error.deactivate.dup=You don't have this role activated.
+command.shop.error.deactivate.not_owned=You do not own this role.
+command.shop.list.title=Role shop
+command.shop.list.description=The following roles are available:
+command.shop.list.footer=Use "{}shop buy <alias>" to buy a role.
+command.shop.list.entry.key={} ({})
+command.shop.list.entry.value={} : {} @{coins}
+command.shop.inventory.title=Role shop
+command.shop.inventory.description=You own the following roles:
+command.shop.inventory.footer=Use "{}shop activate <alias>" to activate a role.
+command.shop.inventory.entry.key={} ({})
+command.shop.inventory.entry.value={}
+command.shop.buy.title=Role shop
+command.shop.buy.description=You successfully purchased the role "{}" for {} @{coins}.
+command.shop.buy.footer=Use "{}shop activate {}" to active it.
+command.shop.activate.reason=Role shop
+command.shop.activate.title=Role shop
+command.shop.activate.description=The role "{}" was activated successfully.
+command.shop.activate.footer=Use "{}shop deactivate {}" to deactivate it again.
+command.shop.deactivate.reason=Role shop
+command.shop.deactivate.title=Role shop
+command.shop.deactivate.description=The role "{}" was deactivated successfully.
+command.shop.deactivate.footer=Use "{}shop activate {}" to activate it again.
+
+command.stats.title=Server stats
+command.stats.entry.members=Members
+command.stats.entry.humans=Humans
+command.stats.entry.bots=Bots
+command.stats.entry.owner=Owner
+command.stats.entry.creation=Creation time
+command.stats.entry.boost_level=Boost level
+command.stats.entry.boosts=Boosts
+command.stats.entry.emojis.normal=normal emojis
+command.stats.entry.emojis.animated=animated emojis
+
+command.magick.error.unknown_operation=Unknown operation: {}
+command.magick.error.operation_failed=Operation "{}" ist failed:\n{}
+command.magick.error.size=The attached file is too big: {} bytes > {} bytes
+command.magick.error.read=I found not read the image from the URL \"{}\": {}
+command.magick.subhelp.title=## Operations:
+command.magick.subhelp.line=- {}
+
+subscription.subscribe.error.empty=Please tell me a keyword.
+subscription.subscribe.error.dup=You have already subscribed to this keyword.
+subscription.subscribe.error.regex=Your RegEx does not seem to work: {}
+subscription.subscribe.error.internal=An error occurred.
+subscription.subscribe.title=subscription
+subscription.subscribe.description=Subscribed to the keyword "{}".
+subscription.subscribe.footer=Use "?unsubscribe {}" to unsubscribe.
+subscription.unsubscribe.error.empty=Please tell me a keyword.
+subscription.unsubscribe.error.noent=You are not subscribed to this keyword.
+subscription.unsubscribe.error.internal=An error occurred.
+subscription.unsubscribe.title=Subscription ended
+subscription.unsubscribe.description=You are no longer subscribed to the keyword "{}"
+subscription.sublist.title=Subscriptions
+subscription.sublist.footer=Use ?unsubscribe to unsubscribe from keywords.
+subscription.message=The keyword "{}" was mentioned:\nhttps://discordapp.com/channels/{}/{}/{}
+
+game.error.not_enough=You do not have enough @{coins}! You need at least {} @{coins}.
+game.error.failure=An error occurred. You got a refund for {} @{coins}.
+game.confirm.title=Confirm?
+game.confirm.description=If you want to proceed react with :white_check_mark:!
+game.confirm.cost.key=Cost
+game.confirm.cost.value={} @{coins}
+game.cancel.title=Cancelled!
+game.cancel.description={}, your game has been cancelled!
+game.announce.title=Game announcement
+game.announce.description=In a few seconds the game {} will begin!
+game.announce.footer=React with ✅ to participate in it!
+
+game.geschenke.title=Geschenke!
+game.geschenke.description=In the most recent {} message {} gifts were hidden. Search for them and react to them to collect them.
+game.geschenke.results.title=Points
+game.geschenke.results.description=The following points where achieved:
+game.geschenke.results.result={}{} => {} @{coins}
+game.geschenke.error.general=An error occurred. Your @{coins} have been refunded!
+
+game.quiz.title=Quiz
+game.quiz.results.title=Winners
+game.quiz.results.description=The following participants have answered correctly:
+game.quiz.results.won=+{} @{coins}
+game.quiz.results.lost=-{} @{coins}
+game.quiz.results.no_correct=Nobody has answered correctly 😭
+game.quiz.results.footer={} {}
+
+game.block.error.general=An error occurred! Your {} @{coins} have been refunded.
+game.block.prize.1000.message=OMG! You just got {} @{coins} out of the block! You are so lucky!
+game.block.prize.500.message=You're lucky, you got {} @{coins} out of the block!
+game.block.prize.100.message=You got {} @{coins} from the block!
+game.block.prize.0.message=Aw men, this block did not contain anything...
+game.block.prize.-20.message=Oha. A Goomba came out of the block and nicked {} @{coins} from you!
+game.block.prize.-100.message=Out of the block came... a Koopa... who stole you {} @{coins}...
+game.block.prize.-250.message=***Gwahaha!** Thank you for freeing me from the block.... I will steal {} of your shiny @{coins}!*
+game.block.prize.100000.message=HOLY! After a long time, you managed to free Legend Müller from the block!! As a thank you, he gives you {}! Alles Müller oder was?
+
+game.slot-machine.format.playing={}\n``---[Slot-Machine]---``\n           {} : {} : {}\n\n           {} : {} : {} **<**\n\n           {} : {} : {}\n``--------------------``
+game.slot-machine.format.won={}\n``---[Slot-Machine]---``\n           {} : {} : {}\n\n           {} : {} : {} **<**\n\n           {} : {} : {}\n``-------[WON]--------``\n**{} @{coins}!**
+game.slot-machine.format.lost={}\n``---[Slot-Machine]---``\n           {} : {} : {}\n\n           {} : {} : {} **<**\n\n           {} : {} : {}\n``-------[LOST]-------``
+
+game.weristes.error.noent=Could not load profile pictures!\nYour @{coins} have been refunded.
+game.weristes.title=Wer ist es?
+game.weristes.description=Send the name, the Discord ID or the nickname (*no ping!*) of the user with this profile picture, as soon as you recognize it!\nYou can only make a guess every 5 seconds.
+game.weristes.results.title=Wer ist es?
+game.weristes.results.noone=Nobody has guessed it correctly! :sob:\nIt was {}!
+game.weristes.results.guessed={} has guessed it correctly! It was {}!
+game.weristes.results.won=+{} @{coins}
+game.weristes.results.lost=-{} @{coins}
+
+chocoboard.token.error.dup=You already have a token. Use ``?chocoboard revoke`` to revoke it first.
+chocoboard.token.error.db=A database error occurred.
+chocoboard.token.title=ChocoBoard
+chocoboard.token.description=Your token is:\n\n{}
+chocoboard.revoke.title=ChocoBoard
+chocoboard.revoke.description={} token(s) successfully revoked!
+chocoboard.title=ChocoBoard
+chocoboard.description=Click on the title to open the ChocoBoard!
+
+issue_events.title=News about "{}"
+issue_events.event.closed_commit=The issue was closed by the commit "{}" ({}).
+issue_events.event.closed=The issue was closed.
+issue_events.event.comment=The issues was commented:\n{}\n\n\n{}
+issue_events.footer=React with ❌ to unsubscribe from these notifications.
+issue_events.unsubscribe.title=Cancellations
+issue_events.unsubscribe.description=You will no longer receive notifications for issue #{}.
+issue_events.unsubscribe.error.noent=You do not receive notifications for this issue in the first place.
+issue_events.unsubscribe.error.internal=An error occurred when unsubscribing.
+
+reminder.self.plain={}, I should remind you!
+reminder.self.message={}, I should remind you about "{}"!
+reminder.other.plain={}, I should remind you from {}!
+reminder.other.message={}, I should remind you from {} about "{}"!
+reminder.delay=I am sadly delayed! The notification was supposed to be {1:%Hh %Mmin %Ss} ago {0:on %F at %T}.
+
+merry-christmas.error.late=It is sadly too late for sending Christmas presents. :cry:
+merry-christmas.error.narg=Arguments missing:\n?merry-christmas <id of receiver> <number of @{coins}> [message]
+merry-christmas.error.negative=That would be theft!
+merry-christmas.error.who=I cannot find the receiver of your gift.
+merry-christmas.error.mutual=You do not share a server with the receiver of your gift.
+merry-christmas.error.fmt=I cannot understand how many @{coins} you want to put into the gift.
+merry-christmas.error.not_enough=You do not have that many @{coins}!
+merry-christmas.error.internal=Internal error!
+merry-christmas.server_select.title=Select server
+merry-christmas.server_select.description=I am not sure on which server you want to send the gift.\nSelect a server by reacting to this message.
+merry-christmas.server_select.entry={} @{coins} | to {}
+merry-christmas.server_select.entry.not_enough={} @{coins} (not enough) | to {}
+merry-christmas.success.title=Merry Christmas!
+merry-christmas.success.description=You gift has been sent successfully.

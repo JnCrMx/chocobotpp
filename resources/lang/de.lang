@@ -165,6 +165,7 @@ command.credits.title={}
 command.credits.dedication=für
 command.credits.event=zu
 command.credits.version=Version
+command.credits.translator.pl=Polnische Übersetzung von
 
 command.gif.error.noent=Ich konnte leider kein passendes GIF finden.
 

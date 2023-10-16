@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <unordered_map>
+#include <string_view>
 
 namespace chocobot::branding {
     namespace colors {
@@ -21,4 +23,8 @@ namespace chocobot::branding {
     constexpr auto author_icon = "https://git.jcm.re/avatars/86ace84d05e13c17d87c9c3debb30ffa";
 
     constexpr auto default_tax_rate = 0.05;
+
+    static std::unordered_map<std::string_view, std::string_view> translators = {
+        {{"pl", "Cyndi"}}
+    };
 }

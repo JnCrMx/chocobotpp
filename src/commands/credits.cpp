@@ -30,6 +30,12 @@ class credits_command : public command
                 (co_await discord.co_user_get_cached(branding::ChocoKeks)).get<dpp::user_identified>().format_username());
             eb.add_field(i18n::translate(conn, guild, "command.credits.event"), "Weihnachten 2019");
             eb.add_field(i18n::translate(conn, guild, "command.credits.version"), std::string{git::Describe()});
+            for(const auto& [lang, translator] : branding::translators) {
+                eb.add_field(
+                    i18n::translate(conn, guild, "command.credits.translator."+std::string(lang)),
+                    std::string(translator)
+                );
+            }
             event.reply(dpp::message{dpp::snowflake{}, eb});
 
             co_return result::success;

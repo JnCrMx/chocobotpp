@@ -26,7 +26,7 @@ static void replace_member(std::string& str, const std::string& param, const dpp
     utils::replaceAll(str, "$"+param, effective_name);
 }
 
-static std::string format_custom_command(const std::string& fmt, const dpp::message_create_t& event)
+static std::string format_custom_command(const std::string& fmt, const dpp::message_create_t& event, std::istream& args)
 {
     std::string text = fmt;
     replace_member(text, "self", event.msg.author, event.msg.member);
@@ -37,6 +37,11 @@ static std::string format_custom_command(const std::string& fmt, const dpp::mess
     for(int i=0; i<mentions.size(); i++) {
         const auto& [user, member] = mentions.at(i);
         replace_member(text, std::to_string(i+1), user, member);
+    }
+
+    std::string arg;
+    for(int i=0; args >> std::quoted(arg); i++) {
+        utils::replaceAll(text, "$"+std::to_string(i+1), arg);
     }
     return text;
 }
@@ -101,7 +106,7 @@ void chocobot::init()
         if(auto opt = database::work(std::bind_front(&database::get_custom_command, &m_db, event.msg.guild_id, command), *connection)) {
             spdlog::log(command::result_level(command::result::success), "Running custom command {} (\"{}\") from user {} in guild {}.",
                 command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
-            event.reply(format_custom_command(*opt, event));
+            event.reply(format_custom_command(*opt, event, iss));
             co_return;
         }
 

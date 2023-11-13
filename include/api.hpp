@@ -3,16 +3,17 @@
 #include "config.hpp"
 #include "database.hpp"
 
-#include <server_http.hpp>
-#include <boost/asio.hpp>
+#include <pistache/async.h>
+#include <pistache/http.h>
+#include <pistache/endpoint.h>
+#include <pistache/router.h>
 
-using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+#include <dpp/cluster.h>
+
 namespace chocobot {
     class chocobot;
 
     class api {
-        using Req = std::shared_ptr<HttpServer::Request>;
-        using Res = std::shared_ptr<HttpServer::Response>;
         public:
             api(const config& config, database& db, chocobot* chocobot);
 
@@ -23,23 +24,25 @@ namespace chocobot {
 
             constexpr static auto API_PREFIX = "/api/v1";
         private:
+            void setupRoutes();
+
+            void healthz(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+            void token_check(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+            void token_guilds(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+            void guild_info(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+            void get_self_user(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+
             std::string m_address;
             int m_port;
 
-            HttpServer m_server{};
-            std::jthread m_thread;
+            Pistache::Http::Endpoint m_endpoint;
+            Pistache::Rest::Router m_router;
 
             chocobot* m_chocobot;
+            dpp::cluster& m_cluster;
             database& m_db;
             struct {
                 std::string check_token;
             } m_prepared_commands;
-
-            std::optional<dpp::snowflake> get_user(Req req);
-
-            void check_token(Res res, Req req);
-            boost::asio::awaitable<void> get_guilds(Res res, Req req);
-            boost::asio::awaitable<void> guild_info(Res res, Req req);
-            boost::asio::awaitable<void> get_self_user(Res res, Req req);
     };
 }

@@ -8,7 +8,6 @@
 #include "database.hpp"
 #include "api.hpp"
 
-using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 namespace chocobot {
 
 class chocobot

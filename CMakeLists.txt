@@ -24,9 +24,9 @@ FetchContent_Declare(cmake_git_version_tracking
   GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
 )
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-FetchContent_Declare(Simple-Web-Server
-  GIT_REPOSITORY https://gitlab.com/eidheim/Simple-Web-Server.git
-  GIT_TAG        27b41f5ee154cca0fce4fe2955dd886d04e3a4ed)
+FetchContent_Declare(pistache
+  GIT_REPOSITORY https://github.com/pistacheio/pistache.git
+  GIT_TAG        master)
 
 set(BUILD_TZ_LIB ON CACHE BOOL "date: build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "date: Use the operating system's timezone database" FORCE)
@@ -39,12 +39,11 @@ endif(NOT BUILD_TEST)
 set(DPP_CORO ON CACHE BOOL "DPP: Experimental support for C++20 coroutines" FORCE)
 set(BUILD_VOICE_SUPPORT OFF CACHE BOOL "DPP: Build voice support" FORCE)
 set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
-set(USE_OPENSSL OFF CACHE BOOL "Simple-Web-Server: set OFF to build without OpenSSL" FORCE)
 
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
 
-FetchContent_MakeAvailable(date cmake_git_version_tracking Simple-Web-Server)
+FetchContent_MakeAvailable(date cmake_git_version_tracking pistache)
 if(BUILD_TEST)
   FetchContent_MakeAvailable(Catch2)
 endif(BUILD_TEST)
@@ -114,8 +113,7 @@ target_link_libraries(chocobot PUBLIC
   ${ImageMagick_LIBRARIES}
   date::date date::date-tz
   cmake_git_version_tracking
-  simple-web-server
-  ssl
+  ssl pistache
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )

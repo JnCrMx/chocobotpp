@@ -21,4 +21,4 @@ steps:
             memory: 3Gi
             cpu: 2500m
         nodeSelector:
-          speed-grade: fast
+          jcm.re/ci-type: big

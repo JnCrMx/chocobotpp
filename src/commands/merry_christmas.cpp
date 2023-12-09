@@ -29,7 +29,8 @@ class merry_christmas_command : public command
                 std::chrono::year_month_day{
                     std::chrono::floor<std::chrono::days>(
                         std::chrono::system_clock::now())}.year());
-            auto res = txn.exec_prepared0(insert_gift, receiver, sender, receiver_guild, amount, message, year);
+            auto res = txn.exec_prepared0(insert_gift, receiver, sender, receiver_guild, amount,
+                message.empty() ? std::optional<std::string>{std::nullopt} : message, year);
             if(res.affected_rows() != 1) {
                 event.reply(utils::build_error(txn, guild, "merry-christmas.error.internal"));
                 co_return result::system_error;
@@ -41,6 +42,8 @@ class merry_christmas_command : public command
             embed.set_color(branding::colors::cookie);
             embed.set_description(i18n::translate(txn, guild, "merry-christmas.success.description"));
             event.reply(dpp::message(event.msg.channel_id, embed));
+
+            txn.commit();
 
             co_return result::success;
         }

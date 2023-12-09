@@ -76,6 +76,11 @@ void chocobot::init()
         cmd->prepare(*this, m_db);
         spdlog::info("Prepared command {}", name);
     }
+    for(auto& [name, cmd] : *private_command_factory::get_map())
+    {
+        cmd->prepare(*this, m_db);
+        spdlog::info("Prepared private command {}", name);
+    }
 
     m_bot.on_message_create([this](dpp::message_create_t event) -> dpp::job {
         if(event.msg.author.is_bot())

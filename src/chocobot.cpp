@@ -1,7 +1,5 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <array>
-#include <algorithm>
 #include <date/date.h>
 #include <date/tz.h>
 #include <pqxx/result>
@@ -14,6 +12,7 @@
 namespace chocobot {
 
 command_factory::map_type* command_factory::map = nullptr;
+private_command_factory::map_type* private_command_factory::map = nullptr;
 
 static void replace_member(std::string& str, const std::string& param, const dpp::user& user, const dpp::guild_member& member)
 {
@@ -86,34 +85,50 @@ void chocobot::init()
         iss >> command;
 
         auto connection = m_db.acquire_connection();
-        std::optional<guild> g = database::work(std::bind_front(&database::get_guild, &m_db, event.msg.guild_id), *connection);
-        if(!g)
-            co_return;
-        guild guild = g.value();
+
+        struct guild guild;
+        bool is_guild_command = event.msg.guild_id != 0ul;
+        if(is_guild_command) {
+            std::optional<struct guild> g = database::work(std::bind_front(&database::get_guild, &m_db, event.msg.guild_id), *connection);
+            if(!g)
+                co_return;
+            guild = g.value();
+        }
+        else {
+            guild.prefix = "?";
+            guild.language = "en";
+            guild.timezone = "UTC";
+        }
 
         if(!command.starts_with(guild.prefix))
             co_return;
 
         command = command.substr(guild.prefix.size());
 
-        if(auto opt = database::work(std::bind_front(&database::get_command_alias, &m_db, event.msg.guild_id, command), *connection)) {
-            auto [new_command, args] = *opt;
-            spdlog::trace("Transformed command alias \"{}\" to \"{}\" for user {} in guild {}.",
-                command, new_command, event.msg.author.format_username(), event.msg.guild_id);
-            command = new_command;
+        class command* cmd;
+        if(is_guild_command) {
+            if(auto opt = database::work(std::bind_front(&database::get_command_alias, &m_db, event.msg.guild_id, command), *connection)) {
+                auto [new_command, args] = *opt;
+                spdlog::trace("Transformed command alias \"{}\" to \"{}\" for user {} in guild {}.",
+                    command, new_command, event.msg.author.format_username(), event.msg.guild_id);
+                command = new_command;
+            }
+
+            if(auto opt = database::work(std::bind_front(&database::get_custom_command, &m_db, event.msg.guild_id, command), *connection)) {
+                spdlog::log(command::result_level(command::result::success), "Running custom command {} (\"{}\") from user {} in guild {}.",
+                    command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
+                event.reply(format_custom_command(*opt, event, iss));
+                co_return;
+            }
+
+            if(!command_factory::get_map()->contains(command))
+                co_return;
+            cmd = command_factory::get_map()->at(command).get();
+        } else {
+            if(!private_command_factory::get_map()->contains(command))
+                co_return;
+            cmd = private_command_factory::get_map()->at(command).get();
         }
-
-        if(auto opt = database::work(std::bind_front(&database::get_custom_command, &m_db, event.msg.guild_id, command), *connection)) {
-            spdlog::log(command::result_level(command::result::success), "Running custom command {} (\"{}\") from user {} in guild {}.",
-                command, event.msg.content, event.msg.author.format_username(), event.msg.guild_id);
-            event.reply(format_custom_command(*opt, event, iss));
-            co_return;
-        }
-
-        if(!command_factory::get_map()->contains(command))
-            co_return;
-
-        auto& cmd = command_factory::get_map()->at(command);
 
         try{
             bool preflight = co_await cmd->preflight(*this, *connection, m_db, m_bot, guild, event, iss);

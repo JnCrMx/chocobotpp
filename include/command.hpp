@@ -96,6 +96,39 @@ struct command_register : command_factory
     command_register(Args&&... args) : command_register(new T(std::forward(args...))) {}
 };
 
+struct private_command_factory
+{
+    using map_type = std::map<std::string, std::unique_ptr<command>>;
+
+	public:
+   		static map_type * get_map()
+        {
+       		if(map == nullptr)
+            {
+                map = new map_type;
+            }
+        	return map;
+   		}
+
+	private:
+   		static map_type * map;
+};
+
+template<typename T>
+struct private_command_register : private_command_factory
+{
+    private_command_register(T* command)
+    {
+        get_map()->insert(std::make_pair(command->get_name(), std::unique_ptr<class command>(command)));
+        spdlog::info("Registered private command {}", command->get_name());
+    }
+
+    private_command_register() : private_command_register(new T) {}
+
+    template<typename... Args>
+    private_command_register(Args&&... args) : private_command_register(new T(std::forward(args...))) {}
+};
+
 };
 
 template<> struct fmt::formatter<chocobot::command::result> : formatter<std::string_view>

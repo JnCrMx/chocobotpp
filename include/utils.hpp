@@ -31,5 +31,6 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
 
 static constexpr int default_avatar_size = 256;
 std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size = default_avatar_size);
+std::string get_effective_name(const dpp::guild_member& member, const dpp::user& user);
 
 }

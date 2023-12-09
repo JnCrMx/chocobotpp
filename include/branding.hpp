@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <string_view>
+#include <array>
 
 namespace chocobot::branding {
     namespace colors {
@@ -27,4 +28,5 @@ namespace chocobot::branding {
     static std::unordered_map<std::string_view, std::string_view> translators = {
         {{"pl", "Cyndi"}}
     };
+    static constexpr std::array answer_emojis = {"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"};
 }

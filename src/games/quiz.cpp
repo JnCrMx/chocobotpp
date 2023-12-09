@@ -6,6 +6,8 @@
 
 namespace chocobot {
 
+using branding::answer_emojis;
+
 class quiz : public multi_player_game
 {
     public:
@@ -29,7 +31,6 @@ class quiz : public multi_player_game
 
         static constexpr auto game_duration = 15s;
         static constexpr auto cleanup_time = 1min;
-        static constexpr std::array answer_emojis = {"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"};
 
         struct quiz_question
         {

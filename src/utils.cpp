@@ -102,5 +102,8 @@ std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp:
         user.format_username(), user.id, member.guild_id, url);
     return url;
 }
+std::string get_effective_name(const dpp::guild_member &member, const dpp::user &user) {
+    return member.nickname.empty() ? user.format_username() : member.nickname;
+}
 
 }

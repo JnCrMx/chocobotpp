@@ -398,6 +398,7 @@ merry-christmas.error.mutual=You do not share a server with the receiver of your
 merry-christmas.error.fmt=I cannot understand how many @{coins} you want to put into the gift.
 merry-christmas.error.not_enough=You do not have that many @{coins}!
 merry-christmas.error.internal=Internal error!
+merry-christmas.error.timeout=I don't have all day.
 merry-christmas.server_select.title=Select server
 merry-christmas.server_select.description=I am not sure on which server you want to send the gift.\nSelect a server by reacting to this message.
 merry-christmas.server_select.entry={} @{coins} | to {}

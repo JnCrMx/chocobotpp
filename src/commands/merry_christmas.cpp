@@ -3,6 +3,8 @@
 #include "utils.hpp"
 #include "branding.hpp"
 
+#include <date/tz.h>
+
 namespace chocobot {
 
 class merry_christmas_command : public command
@@ -55,10 +57,9 @@ class merry_christmas_command : public command
             pqxx::work txn{connection};
 
             auto now = std::chrono::system_clock::now();
-            auto now_zoned = std::chrono::zoned_time{guild.timezone, now};
-
-            std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now_zoned.get_sys_time())};
-            if(ymd.month() != std::chrono::December)
+            auto now_zoned = date::make_zoned(guild.timezone, now);
+            date::year_month_day ymd{date::floor<date::days>(now_zoned.get_local_time())};
+            if(ymd.month() != date::December)
             {
                 co_return result::user_error;
             }

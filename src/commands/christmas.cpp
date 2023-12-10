@@ -4,6 +4,7 @@
 #include "utils.hpp"
 
 #include <Magick++.h>
+#include <date/tz.h>
 #include <pqxx/result>
 #include <random>
 #include <ranges>
@@ -47,6 +48,12 @@ class christmas_command : public command
 
         static constexpr int bot_gift_amount = 250;
         static constexpr std::string_view bot_gift_message = "Merry Christmas from ChocoBot! 💝";
+
+#if MagickLibInterface == 10
+        static constexpr auto mask_composite = Magick::CopyAlphaCompositeOp;
+#elif MagickLibInterface == 6
+        static constexpr auto mask_composite = Magick::CopyOpacityCompositeOp;
+#endif
 
         struct {
             std::string get_gift;
@@ -110,7 +117,7 @@ class christmas_command : public command
                 Magick::DrawableFillColor(Magick::Color("white")),
                 Magick::DrawableCircle(mask.columns()/2.0, mask.rows()/2.0, 0, mask.rows()/2.0)
             });
-            avatar.composite(mask, 0, 0, Magick::CopyOpacityCompositeOp);
+            avatar.composite(mask, 0, 0, mask_composite);
 
             image.draw(Magick::DrawableCompositeImage(star_x-star_size/2.0, star_y-star_size/2.0, star_size, star_size, avatar, Magick::OverCompositeOp));
 
@@ -164,7 +171,7 @@ class christmas_command : public command
                     Magick::Blob inBlob{img.data(), img.size()};
                     senderAvatar.read(inBlob);
                 }
-                senderAvatar.composite(mask, 0, 0, Magick::CopyOpacityCompositeOp);
+                senderAvatar.composite(mask, 0, 0, mask_composite);
                 image.draw(Magick::DrawableCompositeImage(
                     x+gi.avatar_x-gi.avatar_size/2.0,
                     y+gi.avatar_y-gi.avatar_size/2.0,
@@ -222,15 +229,15 @@ class christmas_command : public command
             pqxx::work txn{connection};
 
             auto now = std::chrono::system_clock::now();
-            auto now_zoned = std::chrono::zoned_time{guild.timezone, now};
-            std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now_zoned.get_local_time())};
-            if(ymd.month() != std::chrono::December)
+            auto now_zoned = date::make_zoned(guild.timezone, now);
+            date::year_month_day ymd{date::floor<date::days>(now_zoned.get_local_time())};
+            if(ymd.month() != date::December)
             {
                 co_return result::user_error;
             }
             if(static_cast<unsigned int>(ymd.day()) <= 23) {
                 event.reply(utils::build_error(txn, guild, "command.christmas.error.early"));
-                //co_return result::user_error;
+                co_return result::user_error;
             }
 
             dpp::snowflake uid = event.msg.author.id;

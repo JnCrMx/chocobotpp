@@ -69,6 +69,25 @@ class christmas_command : public command
             return "christmas";
         }
 
+        static double coverage(const Magick::Image& canvas, const Magick::Image& img, int px, int py) {
+            int a = 0;
+            int b = 0;
+            for(int x = 0; x < img.columns(); x++) {
+                for(int y = 0; y < img.rows(); y++) {
+                    Magick::Color c = canvas.pixelColor(px+x, py+y);
+                    Magick::Color i = img.pixelColor(x, y);
+                    if(c.alphaQuantum() > 0) {
+                        b++;
+                        if(i.alphaQuantum() > 0) {
+                            a++;
+                        }
+                    }
+                }
+            }
+            double result = static_cast<double>(a) / static_cast<double>(b);
+            return std::isnan(result) ? 0.0 : result;
+        }
+
         dpp::coroutine<result> show_gifts(pqxx::work& txn, database& db,
             dpp::cluster& discord, const guild& guild,
             const dpp::message_create_t& event, dpp::snowflake uid)
@@ -139,11 +158,16 @@ class christmas_command : public command
 
                 int y = image.rows() - giftImage.rows() - 200 + ((int) (i*(200.0/giftList.size())));
                 int x;
+                unsigned int tries = 0;
                 do
                 {
                     x = std::uniform_int_distribution<int>(0, image.columns()-giftImage.columns())(engine);
                 }
-                while(false); // TODO: check for overlap
+                while(coverage(image, giftImage, x, y) > 0.25 && tries++ < 200);
+                if(tries >= 200) {
+                    spdlog::warn("Failed to place gift {}", gift.id);
+                    continue;
+                }
 
                 image.draw(Magick::DrawableList{
                     Magick::DrawableTranslation(x, y),

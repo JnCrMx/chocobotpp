@@ -69,6 +69,15 @@ class christmas_command : public command
             return "christmas";
         }
 
+        static bool is_transparent(const Magick::Color& c) {
+            using Magick::Quantum;
+#if MagickLibInterface == 10
+            return c.quantumAlpha() == QuantumRange;
+#elif MagickLibInterface == 6
+            return c.alphaQuantum() == QuantumRange;
+#endif
+        }
+
         static double coverage(const Magick::Image& canvas, const Magick::Image& img, int px, int py) {
             int a = 0;
             int b = 0;
@@ -76,9 +85,9 @@ class christmas_command : public command
                 for(int y = 0; y < img.rows(); y++) {
                     Magick::Color c = canvas.pixelColor(px+x, py+y);
                     Magick::Color i = img.pixelColor(x, y);
-                    if(c.alphaQuantum() > 0) {
+                    if(!is_transparent(c)) {
                         b++;
-                        if(i.alphaQuantum() > 0) {
+                        if(!is_transparent(i)) {
                             a++;
                         }
                     }

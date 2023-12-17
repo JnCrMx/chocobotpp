@@ -86,13 +86,13 @@ class game
             m_reaction_handle = m_discord.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
                 if(event.message_id != m_confirm_message.id) return;
                 if(event.reacting_user.id != m_host.id) return;
-                if(event.reacting_emoji.name != "✅") return;
+                if(event.reacting_emoji.name != branding::confirm_emoji) return;
 
                 std::unique_lock<std::mutex> guard(m_lock);
                 m_state = game_state::announce;
                 m_signal.notify_all();
             });
-            m_discord.message_add_reaction(m_confirm_message, "✅");
+            m_discord.message_add_reaction(m_confirm_message, branding::confirm_emoji);
 
             bool confirmed;
             {
@@ -267,7 +267,7 @@ class multi_player_game : public game
             m_announce_message = m_discord.message_create_sync(dpp::message(m_channel, embed));
             m_reaction_add_handle = m_discord.on_message_reaction_add([this](const dpp::message_reaction_add_t& event){
                 if(event.message_id != m_announce_message.id) return;
-                if(event.reacting_emoji.name != "✅") return;
+                if(event.reacting_emoji.name != branding::confirm_emoji) return;
                 if(event.reacting_user.is_bot()) return;
 
                 std::unique_lock<std::mutex> guard(m_lock);
@@ -275,12 +275,12 @@ class multi_player_game : public game
             });
             m_reaction_remove_handle = m_discord.on_message_reaction_remove([this](const dpp::message_reaction_remove_t& event){
                 if(event.message_id != m_announce_message.id) return;
-                if(event.reacting_emoji.name != "✅") return;
+                if(event.reacting_emoji.name != branding::confirm_emoji) return;
 
                 std::unique_lock<std::mutex> guard(m_lock);
                 m_players.erase(event.reacting_user_id);
             });
-            m_discord.message_add_reaction(m_announce_message, "✅");
+            m_discord.message_add_reaction(m_announce_message, branding::confirm_emoji);
 
             std::this_thread::sleep_for(10s);
 

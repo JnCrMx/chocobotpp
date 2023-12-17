@@ -90,6 +90,7 @@ set(SOURCES main.cpp
             src/commands/magick.cpp
             src/commands/merry_christmas.cpp
             src/commands/christmas.cpp
+            src/commands/purge.cpp
             src/games/slot-machine.cpp
             src/games/who-is-it.cpp
             src/games/quiz.cpp)

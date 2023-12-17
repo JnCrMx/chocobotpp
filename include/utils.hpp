@@ -33,4 +33,6 @@ static constexpr int default_avatar_size = 256;
 std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp::user& user, int size = default_avatar_size);
 std::string get_effective_name(const dpp::guild_member& member, const dpp::user& user);
 
+bool parse_message_link(const std::string& link, dpp::snowflake& guild, dpp::snowflake& channel, dpp::snowflake& message);
+
 }

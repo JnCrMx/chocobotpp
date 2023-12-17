@@ -106,4 +106,23 @@ std::string get_effective_name(const dpp::guild_member &member, const dpp::user 
     return member.nickname.empty() ? user.format_username() : member.nickname;
 }
 
+bool parse_message_link(const std::string &link, dpp::snowflake &guild, dpp::snowflake &channel, dpp::snowflake &message)
+{
+    if(!link.starts_with("https://discord.com/channels/"))
+        return false;
+    std::string subs = link.substr(29);
+    std::istringstream iss(subs);
+    if(!(iss >> guild))
+        return false;
+    if(iss.get() != '/')
+        return false;
+    if(!(iss >> channel))
+        return false;
+    if(iss.get() != '/')
+        return false;
+    if(!(iss >> message))
+        return false;
+    return true;
+}
+
 }

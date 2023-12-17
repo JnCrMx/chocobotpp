@@ -47,6 +47,7 @@ command.noop.help=Do absolutely nothing.
 command.ping.help=Return the ping of the bot.
 command.glückskeks.help=Open a fortune cookie.
 command.magick.help=Edit an image.
+command.purge.help=Bulk delete messages.
 
 command.coins.usage={cmd} : {help}\n{cmd} <user> @{opcmd} : Show @{coins} of a different user.
 command.daily.usage={cmd} : {help}
@@ -75,6 +76,7 @@ command.noop.usage={cmd} : {help}
 command.ping.usage={cmd} : {help}\n{cmd} <number> : Wait <number> seconds before returning the ping.
 command.glückskeks.usage={cmd} : {help}
 command.magick.usage={cmd} <operations>...: {help}
+command.purge.usage={cmd} <link to first message> <link to last message>: {help}
 
 command.coins.error.perm=You are not allowed to see the @{coins} of other users.
 command.coins.title=@{coinmoji} @{coins} @{coinmoji}
@@ -298,6 +300,20 @@ command.magick.error.size=The attached file is too big: {} bytes > {} bytes
 command.magick.error.read=I found not read the image from the URL \"{}\": {}
 command.magick.subhelp.title=## Operations:
 command.magick.subhelp.line=- {}
+
+command.purge.error.nargs=You need to give me a link to the first and to the last message I should purge.
+command.purge.error.invalid_message_link=The message link you gave me is invalid.
+command.purge.error.wrong_guild=The message was not sent in this guild.
+command.purge.error.two_channels=The messages were sent in different channels.
+command.purge.error.invalid_order=The second message is older than the first one.
+command.purge.error.no_messages=No messages to purge.
+command.purge.error.cancel=The deletion was not confirmed.
+command.purge.error.failed=Failed to bulk delete the messages.
+command.purge.confirm.title=⚠️ Remove {} messages? ⚠️
+command.purge.confirm.description=Are you really sure that you want to delete {} messages that you have sent? This action cannot be undone.
+command.purge.confirm.footer=React with ✅ to confirm or with ❌ to cancel.
+command.purge.success.title=Successfully deleted {} messages.
+command.purge.success.description=Your messages have been deleted.
 
 subscription.subscribe.error.empty=Please tell me a keyword.
 subscription.subscribe.error.dup=You have already subscribed to this keyword.

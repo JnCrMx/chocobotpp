@@ -29,8 +29,11 @@ class XUserID : public Http::Header::Header {
         dpp::snowflake m_uid;
 };
 
-api::api(const config& config, database& db, chocobot* chocobot) : m_chocobot(chocobot), m_cluster(chocobot->m_bot), m_db(db), m_port(config.api_port),
-    m_endpoint(Address(IP::any(), m_port)) {
+api::api(const config& config, database& db, chocobot* chocobot) :
+    m_chocobot(chocobot), m_cluster(chocobot->m_bot), m_db(db),
+    m_port(config.api_port), m_owner(config.owner),
+    m_endpoint(Address(IP::any(), m_port))
+{
     auto opts = Http::Endpoint::options()
         .threads(static_cast<int>(4))
         .flags(Tcp::Options::ReuseAddr);
@@ -41,11 +44,14 @@ api::api(const config& config, database& db, chocobot* chocobot) : m_chocobot(ch
 
 void api::prepare() {
     m_prepared_commands.check_token = m_db.prepare("check_token", "SELECT \"user\" FROM tokens WHERE token = $1");
+    m_prepared_commands.save_streaks = m_db.prepare("save_streaks", "UPDATE coins SET last_daily=GREATEST(EXTRACT(EPOCH FROM (CURRENT_DATE)::TIMESTAMP - INTERVAL '1 day' + INTERVAL '12 hours')::BIGINT*1000, last_daily);");
 }
 
 static const std::set<std::string> public_routes = {
    api:: API_PREFIX+"/token/check"s, api::API_PREFIX+"/healthz"s
 };
+static const std::string admin_prefix = "/admin";
+
 void api::setupRoutes() {
     using namespace Pistache::Rest;
 
@@ -97,12 +103,31 @@ void api::setupRoutes() {
         req.headers().add<XUserID>(user);
         return true;
     });
+    m_router.addMiddleware([this](Http::Request& req, Http::ResponseWriter& resp)->bool {
+        if(!req.resource().starts_with(API_PREFIX+admin_prefix) ||
+            req.method() == Http::Method::Options ||
+            public_routes.contains(req.resource())) {
+            return true;
+        }
+        if(m_owner.empty()) {
+            resp.send(Http::Code::Forbidden);
+            return false;
+        }
+
+        dpp::snowflake user = req.headers().get<XUserID>()->uid();
+        if(user != m_owner) {
+            resp.send(Http::Code::Forbidden);
+            return false;
+        }
+        return true;
+    });
 
     Routes::Get(m_router, API_PREFIX+"/healthz"s, Routes::bind(&api::healthz, this));
     Routes::Post(m_router, API_PREFIX+"/token/check"s, Routes::bind(&api::token_check, this));
     Routes::Get(m_router, API_PREFIX+"/token/guilds"s, Routes::bind(&api::token_guilds, this));
     Routes::Get(m_router, API_PREFIX+"/:id/guild/info"s, Routes::bind(&api::guild_info, this));
     Routes::Get(m_router, API_PREFIX+"/:id/user/self"s, Routes::bind(&api::get_self_user, this));
+    Routes::Post(m_router, API_PREFIX+admin_prefix+"/save_streaks"s, Routes::bind(&api::save_streaks, this));
 }
 
 void api::start() {
@@ -261,6 +286,17 @@ void api::get_self_user(const Pistache::Rest::Request& request, Pistache::Http::
         j["operator"] = guild.owner_id == user;
 
         response.send(Http::Code::Ok, nlohmann::to_string(j));
+        co_return;
+    }(std::move(response));
+}
+
+void api::save_streaks(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response) {
+    [this](Http::ResponseWriter response) mutable -> dpp::job {
+        auto conn = m_db.acquire_connection();
+        pqxx::work txn{*conn};
+        txn.exec_prepared(m_prepared_commands.save_streaks);
+        txn.commit();
+        response.send(Http::Code::Ok);
         co_return;
     }(std::move(response));
 }

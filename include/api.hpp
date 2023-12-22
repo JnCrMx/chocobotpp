@@ -31,9 +31,11 @@ namespace chocobot {
             void token_guilds(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
             void guild_info(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
             void get_self_user(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+            void save_streaks(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
 
             std::string m_address;
             int m_port;
+            dpp::snowflake m_owner;
 
             Pistache::Http::Endpoint m_endpoint;
             Pistache::Rest::Router m_router;
@@ -43,6 +45,7 @@ namespace chocobot {
             database& m_db;
             struct {
                 std::string check_token;
+                std::string save_streaks;
             } m_prepared_commands;
     };
 }

@@ -11,6 +11,7 @@ struct config
 {
     std::string token;
     std::string db_uri;
+    dpp::snowflake owner;
 
     std::string bugreport_command;
 
@@ -28,6 +29,7 @@ struct config
     config(nlohmann::json j) :
         token(j["token"]),
         db_uri(j["database"]),
+        owner(j.value<uint64_t>("owner", {})),
         bugreport_command(j.value("bugreport", "false")),
         api_port(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("port", 8080)),
         api_address(j.value("api", nlohmann::json(nlohmann::json::value_t::object)).value("address", "")),

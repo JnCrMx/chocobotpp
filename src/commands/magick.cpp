@@ -113,10 +113,10 @@ class magick_command : public paid_command
 
             {
                 Magick::Blob outBlob{};
-                image.write(&outBlob, "jpg");
+                image.write(&outBlob, "webp");
 
                 event.reply(dpp::message{}
-                    .add_file("image.jpg", std::string(reinterpret_cast<const char*>(outBlob.data()), outBlob.length())));
+                    .add_file("image.webp", std::string(reinterpret_cast<const char*>(outBlob.data()), outBlob.length())));
             }
             co_return result::success;
         }

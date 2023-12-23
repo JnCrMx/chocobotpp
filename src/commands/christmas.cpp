@@ -174,8 +174,7 @@ class christmas_command : public command
                 }
                 while(coverage(image, giftImage, x, y) > 0.25 && tries++ < 200);
                 if(tries >= 200) {
-                    spdlog::warn("Failed to place gift {}", gift.id);
-                    continue;
+                    spdlog::warn("Failed to find a suitable position for gift {}, but we will place it anyways", gift.id);
                 }
 
                 image.draw(Magick::DrawableList{

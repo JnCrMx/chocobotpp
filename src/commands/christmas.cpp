@@ -49,6 +49,8 @@ class christmas_command : public command
         static constexpr int bot_gift_amount = 250;
         static constexpr std::string_view bot_gift_message = "Merry Christmas from ChocoBot! 💝";
 
+        static constexpr unsigned int placement_tries = 0;
+
 #if MagickLibInterface == 10
         static constexpr auto mask_composite = Magick::CopyAlphaCompositeOp;
 #elif MagickLibInterface == 6
@@ -128,8 +130,6 @@ class christmas_command : public command
             std::shuffle(opened.begin(), opened.end(), engine);
             std::copy(opened.begin(), opened.end(), std::back_inserter(giftList));
 
-            spdlog::trace("giftList: {}", giftList.size());
-
             Magick::Image image{};
             image.read(i18n::resource_root+"/images"+std::string(christmas_tree));
 
@@ -172,10 +172,11 @@ class christmas_command : public command
                 {
                     x = std::uniform_int_distribution<int>(0, image.columns()-giftImage.columns())(engine);
                 }
-                while(coverage(image, giftImage, x, y) > 0.25 && tries++ < 200);
-                if(tries >= 200) {
+                while(tries++ < placement_tries && coverage(image, giftImage, x, y) > 0.25);
+                if(tries >= placement_tries) {
                     spdlog::warn("Failed to find a suitable position for gift {}, but we will place it anyways", gift.id);
                 }
+                spdlog::trace("Placing gift {} took {} tries.", gift.id, tries);
 
                 image.draw(Magick::DrawableList{
                     Magick::DrawableTranslation(x, y),
@@ -203,6 +204,7 @@ class christmas_command : public command
                     Magick::Blob inBlob{img.data(), img.size()};
                     senderAvatar.read(inBlob);
                 }
+                senderAvatar.resize(Magick::Geometry(mask.columns(), mask.rows()));
                 senderAvatar.composite(mask, 0, 0, mask_composite);
                 image.draw(Magick::DrawableCompositeImage(
                     x+gi.avatar_x-gi.avatar_size/2.0,

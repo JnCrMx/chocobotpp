@@ -49,7 +49,7 @@ class christmas_command : public command
         static constexpr int bot_gift_amount = 250;
         static constexpr std::string_view bot_gift_message = "Merry Christmas from ChocoBot! 💝";
 
-        static constexpr unsigned int placement_tries = 0;
+        static constexpr unsigned int placement_tries = 10;
 
 #if MagickLibInterface == 10
         static constexpr auto mask_composite = Magick::CopyAlphaCompositeOp;
@@ -214,6 +214,7 @@ class christmas_command : public command
 
             {
                 Magick::Blob outBlob{};
+                image.defineValue("webp", "low-memory", "true");
                 image.write(&outBlob, "webp");
 
                 event.reply(dpp::message{}

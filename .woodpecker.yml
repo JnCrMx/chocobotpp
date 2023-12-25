@@ -9,8 +9,6 @@ steps:
       registry: git.jcm.re
       tags: latest
       snapshot-mode: redo
-      enable-cache: true
-      cache-repo: git.jcm.re/jcm/chocobot-cache
     backend_options:
       kubernetes:
         resources:

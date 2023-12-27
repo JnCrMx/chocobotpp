@@ -32,6 +32,7 @@ RUN mkdir -p /src/cmake && ln -s /build/_deps/dpp-src/cmake/dpp-config.cmake /sr
 FROM docker.io/ubuntu:mantic AS runtime
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
     fortunes \
     gsfonts \
     libmagick++-6.q16-8 \

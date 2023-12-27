@@ -2,7 +2,7 @@
     "token": "your-bot-token",
     "database": "postgres://chocobot@localhost/chocobot",
     "owner": your-user-id,
-    "bugreport": "sendmail -S ... -f chocobot-bugreport@... ...@...",
+    "bugreport": "curl smtp://mail.example.com --mail-from chocobot@example.org --mail-rcpt you@example.org -T -",
     "api": {
         "port": 8080,
         "address": ""

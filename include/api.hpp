@@ -36,6 +36,7 @@ namespace chocobot {
             std::string m_address;
             int m_port;
             dpp::snowflake m_owner;
+            config::cors_config m_cors_config;
 
             Pistache::Http::Endpoint m_endpoint;
             Pistache::Rest::Router m_router;

@@ -5,7 +5,13 @@
     "bugreport": "curl smtp://mail.example.com --mail-from chocobot@example.org --mail-rcpt you@example.org -T -",
     "api": {
         "port": 8080,
-        "address": ""
+        "address": "",
+        "cors": {
+            "enabled": true,
+            "origins": [
+                "https://example.org"
+            ]
+        }
     },
     "tax_rate": 0.05,
     "taxes": {

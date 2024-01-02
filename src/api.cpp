@@ -9,29 +9,80 @@ namespace chocobot {
 using namespace Pistache;
 using namespace std::literals;
 
-class XUserID : public Http::Header::Header {
-    public:
-        NAME("X-User-ID")
+namespace headers {
+    class XUserID : public Http::Header::Header {
+        public:
+            NAME("X-User-ID")
 
-        XUserID(dpp::snowflake uid) : m_uid(uid) {}
+            XUserID() = default;
+            XUserID(dpp::snowflake uid) : m_uid(uid) {}
 
-        void parse(const std::string& data) override {
-            m_uid = std::stoull(data);
-        }
-        void write(std::ostream& os) const override {
-            os << m_uid;
-        }
+            void parse(const std::string& data) override {
+                m_uid = std::stoull(data);
+            }
+            void write(std::ostream& os) const override {
+                os << m_uid;
+            }
 
-        dpp::snowflake uid() const {
-            return m_uid;
-        }
-    private:
-        dpp::snowflake m_uid;
-};
+            dpp::snowflake uid() const {
+                return m_uid;
+            }
+        private:
+            dpp::snowflake m_uid;
+    };
+
+    class Origin : public Http::Header::Header {
+        public:
+            NAME("Origin")
+
+            Origin() = default;
+            Origin(std::string origin) : m_origin(std::move(origin)) {}
+
+            void parse(const std::string& data) override {
+                m_origin = data;
+            }
+            void write(std::ostream& os) const override {
+                os << m_origin;
+            }
+
+            const std::string& value() const {
+                return m_origin;
+            }
+        private:
+            std::string m_origin;
+    };
+
+    class Vary : public Http::Header::Header {
+        public:
+            NAME("Vary")
+
+            Vary() = default;
+            Vary(std::string vary) : m_vary(std::move(vary)) {}
+
+            void parse(const std::string& data) override {
+                m_vary = data;
+            }
+            void write(std::ostream& os) const override {
+                os << m_vary;
+            }
+
+            const std::string& value() const {
+                return m_vary;
+            }
+        private:
+            std::string m_vary;
+    };
+
+    using Pistache::Http::Header::Registrar;
+    RegisterHeader(XUserID);
+    RegisterHeader(Origin);
+    RegisterHeader(Vary);
+}
+using XUserID = headers::XUserID;
 
 api::api(const config& config, database& db, chocobot* chocobot) :
     m_chocobot(chocobot), m_cluster(chocobot->m_bot), m_db(db),
-    m_port(config.api_port), m_owner(config.owner),
+    m_port(config.api_port), m_owner(config.owner), m_cors_config(config.api_cors),
     m_endpoint(Address(IP::any(), m_port))
 {
     auto opts = Http::Endpoint::options()
@@ -40,6 +91,25 @@ api::api(const config& config, database& db, chocobot* chocobot) :
     m_endpoint.init(opts);
 
     setupRoutes();
+
+    if(m_cors_config.enabled) {
+        if(m_cors_config.origins.empty()) {
+            spdlog::warn("CORS is enabled but no origins are specified.");
+        }
+        else if(m_cors_config.origins.contains("*")) {
+            spdlog::warn("CORS is enabled and all origins are allowed.");
+        }
+        else {
+            spdlog::info("CORS is enabled and {} origin{} allowed.", m_cors_config.origins.size(),
+                m_cors_config.origins.size() == 1 ? " is" : "s are");
+            if(spdlog::should_log(spdlog::level::debug)) {
+                spdlog::debug("The following origins are allowed:");
+                for(const auto& origin : m_cors_config.origins) {
+                    spdlog::debug("  {}", origin);
+                }
+            }
+        }
+    }
 }
 
 void api::prepare() {
@@ -55,20 +125,40 @@ static const std::string admin_prefix = "/admin";
 void api::setupRoutes() {
     using namespace Pistache::Rest;
 
-    constexpr auto do_cors = [](Http::ResponseWriter& resp){
-        resp.headers().add<Http::Header::AccessControlAllowMethods>("GET, POST, PUT, DELETE, PATCH");
-        resp.headers().add<Http::Header::AccessControlAllowOrigin>("*");
-        resp.headers().add<Http::Header::AccessControlAllowHeaders>("authorization");
-    };
+    auto do_cors = [this](const Http::Header::Collection& headers, Http::ResponseWriter& resp){
+        if(!m_cors_config.enabled) return;
 
+        // TODO: Add support for Cross-Origin-Resource-Policy header
+        resp.headers().add<Http::Header::AccessControlAllowMethods>("GET, POST, PUT, DELETE, PATCH");
+        resp.headers().add<Http::Header::AccessControlAllowHeaders>("authorization");
+
+        if(m_cors_config.origins.contains("*")) {
+            resp.headers().add<Http::Header::AccessControlAllowOrigin>("*");
+            return;
+        }
+        if(m_cors_config.origins.size() == 1) {
+            resp.headers().add<Http::Header::AccessControlAllowOrigin>(*m_cors_config.origins.begin());
+            return;
+        } else {
+            resp.headers().add<headers::Vary>("Origin");
+
+            if(!headers.has<headers::Origin>())
+                return;
+            auto origin = headers.get<headers::Origin>();
+            if(m_cors_config.origins.contains(origin->value())) {
+                resp.headers().add<Http::Header::AccessControlAllowOrigin>(origin->value());
+                return;
+            }
+        }
+    };
     m_router.addMiddleware([do_cors](Http::Request& req, Http::ResponseWriter& resp)->bool {
-        do_cors(resp);
+        do_cors(req.headers(), resp);
         return true;
     });
     m_router.addCustomHandler([do_cors](const Rest::Request& request, Http::ResponseWriter response){
         if(request.method() != Http::Method::Options || !request.resource().starts_with(API_PREFIX))
             return Route::Result::Failure;
-        do_cors(response);
+        do_cors(request.headers(), response);
         response.send(Http::Code::Ok);
         return Route::Result::Ok;
     });
@@ -133,6 +223,8 @@ void api::setupRoutes() {
 void api::start() {
     m_endpoint.setHandler(m_router.handler());
     m_endpoint.serveThreaded();
+
+    spdlog::info("API is listening on port {}", m_port);
 }
 
 void api::stop() {

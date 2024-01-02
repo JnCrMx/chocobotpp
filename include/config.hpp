@@ -5,6 +5,8 @@
 #include <nlohmann/json.hpp>
 #include <dpp/snowflake.h>
 
+#include <unordered_set>
+
 namespace chocobot {
 
 struct config
@@ -17,6 +19,10 @@ struct config
 
     std::string api_address;
     int api_port;
+    struct cors_config {
+        bool enabled = false;
+        std::unordered_set<std::string> origins{};
+    } api_cors;
 
     struct command_tax {
         dpp::snowflake receiver;
@@ -43,6 +49,14 @@ struct config
             } else {
                 taxes[key] = {value.get<uint64_t>(), tax_rate};
             }
+        }
+
+        if(j.contains("api") && j["api"].contains("cors")) {
+            api_cors.enabled = j["api"]["cors"].value("enabled", false);
+            if(j["api"]["cors"].contains("origin"))
+                api_cors.origins = {j["api"]["cors"]["origin"]};
+            else
+                api_cors.origins = j["api"]["cors"].value("origins", std::unordered_set<std::string>{});
         }
     }
     config() = default;

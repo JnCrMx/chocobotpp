@@ -1,13 +1,19 @@
-#include "paid_command.hpp"
+module;
 
-#include "chocobot.hpp"
-#include "branding.hpp"
-#include "i18n.hpp"
-#include "utils.hpp"
-
-#include <pqxx/transaction.hxx>
 #include <random>
-#include <dpp/user.h>
+#include <iostream>
+#include <string>
+#include <coroutine>
+#include <unordered_map>
+
+module chocobot;
+
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
+import chocobot.config;
+import pqxx;
+import dpp;
 
 namespace chocobot {
 

@@ -1,12 +1,14 @@
 module;
 
-#include <nlohmann/json.hpp>
-#include <dpp/snowflake.h>
-
 #include <unordered_set>
+#include <unordered_map>
+#include <string>
+#include <cstdint>
 
 export module chocobot.config;
+
 import chocobot.branding;
+import dpp;
 
 namespace chocobot {
 

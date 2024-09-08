@@ -1,9 +1,13 @@
-#include "command.hpp"
-#include "utils.hpp"
-#include "i18n.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
 
 #include <date/date.h>
 #include <date/tz.h>
+
+import chocobot;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 

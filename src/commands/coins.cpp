@@ -1,10 +1,14 @@
-#include "command.hpp"
-#include "chocobot.hpp"
-#include "i18n.hpp"
-#include "branding.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
 
 #include <date/date.h>
 #include <date/tz.h>
+
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import pqxx;
 
 namespace chocobot {
 

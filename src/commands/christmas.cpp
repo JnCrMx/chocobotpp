@@ -1,13 +1,16 @@
-#include "branding.hpp"
-#include "command.hpp"
-#include "i18n.hpp"
-#include "utils.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
 
 #include <Magick++.h>
 #include <date/tz.h>
-#include <pqxx/result>
 #include <random>
-#include <ranges>
+
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
+import pqxx;
 
 namespace chocobot {
 
@@ -53,7 +56,7 @@ class christmas_command : public command
 
 #if MagickLibInterface == 10
         static constexpr auto mask_composite = Magick::CopyAlphaCompositeOp;
-#elif MagickLibInterface == 6
+#elif MagickLibInterface == 6 || MagickLibInterface == 7
         static constexpr auto mask_composite = Magick::CopyOpacityCompositeOp;
 #endif
 
@@ -75,8 +78,10 @@ class christmas_command : public command
             using Magick::Quantum;
 #if MagickLibInterface == 10
             return c.quantumAlpha() == QuantumRange;
-#elif MagickLibInterface == 6
+#elif MagickLibInterface == 6 || MagickLibInterface == 7
             return c.alphaQuantum() == QuantumRange;
+#else
+            #error "Unsupported ImageMagick version"
 #endif
         }
 

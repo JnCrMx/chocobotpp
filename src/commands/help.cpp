@@ -1,9 +1,12 @@
-#include "command.hpp"
-#include "paid_command.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
 
-#include <utils.hpp>
-#include <i18n.hpp>
-#include <branding.hpp>
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
+import pqxx;
 
 namespace chocobot {
 

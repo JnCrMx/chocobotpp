@@ -1,8 +1,9 @@
 #include "games.hpp"
-#include "i18n.hpp"
-#include "branding.hpp"
 
 #include <random>
+
+import chocobot.branding;
+import chocobot.i18n;
 
 namespace chocobot {
 

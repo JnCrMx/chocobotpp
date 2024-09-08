@@ -1,9 +1,15 @@
-#include "command.hpp"
-#include "i18n.hpp"
-#include "utils.hpp"
-
+#include <iostream>
+#include <string>
+#include <coroutine>
 #include <random>
 #include <set>
+#include <iomanip>
+#include <charconv>
+#include <optional>
+
+import chocobot;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 
@@ -42,7 +48,7 @@ class random_command : public command
                     std::vector<dpp::guild_member> members;
                     for(auto [_, member] : map)
                     {
-                        for(auto role : member.roles)
+                        for(auto role : member.get_roles())
                         {
                             if(roles.contains(role))
                             {

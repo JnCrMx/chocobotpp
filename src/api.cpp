@@ -1,8 +1,18 @@
-#include "api.hpp"
-#include "chocobot.hpp"
+module;
 
-#include <spdlog/spdlog.h>
-#include <pqxx/nontransaction>
+#include "pistache_macros.hpp"
+
+#include <coroutine>
+#include <set>
+#include <string>
+#include <cstdint>
+#include <optional>
+
+module chocobot;
+
+import pqxx;
+import spdlog;
+import pistache;
 
 namespace chocobot {
 
@@ -324,7 +334,7 @@ void api::guild_info(const Pistache::Rest::Request& request, Pistache::Http::Res
             dpp::user owner_user = (co_await m_cluster.co_user_get_cached(guild.owner_id)).get<dpp::user_identified>();
             guild_info["owner"]["userId"] = std::to_string(owner.user_id);
             guild_info["owner"]["tag"] = owner_user.format_username();
-            guild_info["owner"]["nickname"] = owner.nickname.empty() ? owner_user.username : owner.nickname;
+            guild_info["owner"]["nickname"] = owner.get_nickname().empty() ? owner_user.username : owner.get_nickname();
             guild_info["owner"]["avatarUrl"] = owner.get_avatar_url().empty() ? owner_user.get_avatar_url() : owner.get_avatar_url();
 
             response.send(Http::Code::Ok, nlohmann::to_string(guild_info));
@@ -368,13 +378,13 @@ void api::get_self_user(const Pistache::Rest::Request& request, Pistache::Http::
         nlohmann::json j{};
         j["userId"] = std::to_string(user);
         j["tag"] = member_user.format_username();
-        j["nickname"] = member.nickname.empty() ? member_user.username : member.nickname;
+        j["nickname"] = member.get_nickname().empty() ? member_user.username : member.get_nickname();
         j["avatarUrl"] = member.get_avatar_url().empty() ? member_user.get_avatar_url() : member.get_avatar_url();
         j["coins"] = coins;
         j["onlineStatus"] = "ONLINE";
         j["timeJoined"] = member.joined_at;
-        j["role"] = roles.contains(member.roles.front()) ? roles.at(member.roles.front()).name : "";
-        j["roleColor"] = roles.contains(member.roles.front()) ? roles.at(member.roles.front()).colour : 0u;
+        j["role"] = roles.contains(member.get_roles().front()) ? roles.at(member.get_roles().front()).name : "";
+        j["roleColor"] = roles.contains(member.get_roles().front()) ? roles.at(member.get_roles().front()).colour : 0u;
         j["operator"] = guild.owner_id == user;
 
         response.send(Http::Code::Ok, nlohmann::to_string(j));

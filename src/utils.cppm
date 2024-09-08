@@ -1,15 +1,17 @@
 module;
 
-#include <dpp/dpp.h>
-#include <spdlog/spdlog.h>
 #include <sstream>
 #include <filesystem>
 #include <optional>
-#include <dpp/message.h>
-#include <pqxx/nontransaction>
+#include <vector>
+#include <functional>
 
 export module chocobot.utils;
 import chocobot.database;
+import chocobot.branding;
+import spdlog;
+import pqxx;
+import dpp;
 
 export namespace chocobot::utils {
 
@@ -19,15 +21,17 @@ std::optional<std::string> get_env(const std::string& key);
 dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 dpp::message build_error(pqxx::connection& db, const guild& guild, const std::string& key);
 
+std::optional<dpp::user> get_user(dpp::snowflake id) {
+    auto u = dpp::find_user(id);
+    if(u) return std::optional<dpp::user>{*u};
+    return std::optional<dpp::user>{};
+}
+
 std::optional<dpp::snowflake> parse_mention(const std::string& mention);
 std::string solve_mentions(const std::string& string,
     std::function<std::string(const dpp::user&)> to_string = &dpp::user::format_username,
     const std::string& fallback = "unknown user",
-    std::function<std::optional<dpp::user>(dpp::snowflake)> getter = [](dpp::snowflake s){
-        auto u = dpp::find_user(s);
-        if(u) return std::optional<dpp::user>{*u};
-        return std::optional<dpp::user>{};
-    });
+    std::function<std::optional<dpp::user>(dpp::snowflake)> getter = &get_user);
 
 void replaceAll(std::string& str, const std::string& from, const std::string& to);
 
@@ -54,15 +58,7 @@ std::optional<std::string> get_env(const std::string& key)
     return val == NULL ? std::optional<std::string>{} : std::string(val);
 }
 
-dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
-{
-    dpp::embed embed{};
-    embed.set_title(i18n::translate(txn, guild, "error"));
-    embed.set_color(branding::colors::error);
-    embed.set_description(i18n::translate(txn, guild, key));
-    return dpp::message{dpp::snowflake{}, embed};
-}
-
+dpp::message build_error(pqxx::transaction_base& txn, const guild& guild, const std::string& key);
 dpp::message build_error(pqxx::connection& db, const guild& guild, const std::string& key)
 {
     pqxx::nontransaction txn{db};
@@ -130,7 +126,7 @@ std::string get_effective_avatar_url(const dpp::guild_member& member, const dpp:
     return url;
 }
 std::string get_effective_name(const dpp::guild_member &member, const dpp::user &user) {
-    return member.nickname.empty() ? user.format_username() : member.nickname;
+    return member.get_nickname().empty() ? user.format_username() : member.get_nickname();
 }
 
 bool parse_message_link(const std::string &link, dpp::snowflake &guild, dpp::snowflake &channel, dpp::snowflake &message)

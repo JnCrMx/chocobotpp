@@ -22,8 +22,7 @@ export namespace chocobot::branding {
     constexpr auto project_home = "https://git.jcm.re/jcm/chocobotpp";
     constexpr auto author_name = "JCM";
     constexpr auto author_url = "https://git.jcm.re/jcm";
-    // TODO: Change once Gitea 1.19 is released and we can use https://git.jcm.re/jcm.png
-    constexpr auto author_icon = "https://git.jcm.re/avatars/86ace84d05e13c17d87c9c3debb30ffa";
+    constexpr auto author_icon = "https://git.jcm.re/jcm.png";
 
     constexpr auto default_tax_rate = 0.05;
 

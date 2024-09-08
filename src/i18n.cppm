@@ -1,15 +1,24 @@
-#include "i18n.hpp"
-#include "utils.hpp"
+module;
 
+#include <string>
+#include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <map>
-#include <fstream>
-#include <spdlog/spdlog.h>
+
+export module chocobot.i18n;
+import chocobot.database;
+import chocobot.utils;
+import spdlog;
+import pqxx;
 
 namespace chocobot::i18n {
 
 constexpr std::array RESOURCE_CANDIDATES = {"./resources", "/usr/local/share/chocobot/resources", "/usr/share/chocobot/resources"};
 constexpr auto ENV_RESOURCES = "CHOCOBOT_RESOURCES_PATH";
 constexpr auto ENV_ROOT = "CHOCOBOT_ROOT";
+
+export inline std::string resource_root;
+std::map<std::string, std::map<std::string, std::string>> translations;
 
 static std::string find_resource_root()
 {
@@ -33,8 +42,7 @@ static std::string find_resource_root()
     }
 }
 
-std::map<std::string, std::map<std::string, std::string>> translations;
-void init_i18n()
+export void init_i18n()
 {
     std::string root = find_resource_root();
     resource_root = root;
@@ -65,7 +73,7 @@ void init_i18n()
     }
 }
 
-std::string translate_get(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
+export std::string translate_get(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
 {
     // TODO: check overrides
 
@@ -82,7 +90,7 @@ std::string translate_get(pqxx::transaction_base& txn, const guild& guild, const
     return key; // translation not found, just return the key
 }
 
-std::string translate_base(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
+export std::string translate_base(pqxx::transaction_base& txn, const guild& guild, const std::string& key)
 {
     std::string translation = translate_get(txn, guild, key);
 
@@ -97,6 +105,20 @@ std::string translate_base(pqxx::transaction_base& txn, const guild& guild, cons
     }
 
     return translation;
+}
+
+export template <typename... T>
+std::string translate(pqxx::transaction_base& txn, const guild& guild, const std::string& key, T&&... args)
+{
+    std::string translation = translate_base(txn, guild, key);
+    return fmt::vformat(translation, fmt::make_format_args(args...));
+}
+
+export template <typename... T>
+std::string translate(pqxx::connection& conn, const guild& guild, const std::string& key, T&&... args)
+{
+    pqxx::nontransaction txn(conn);
+    return translate(txn, guild, key, args...);
 }
 
 }

@@ -1,13 +1,19 @@
-#include <spdlog/spdlog.h>
+module;
+
+#include <coroutine>
 #include <sstream>
+#include <functional>
+#include <condition_variable>
+#include <thread>
 #include <date/date.h>
 #include <date/tz.h>
-#include <pqxx/result>
 
-#include "chocobot.hpp"
-#include "command.hpp"
-#include "i18n.hpp"
-#include "utils.hpp"
+module chocobot;
+
+import pqxx;
+import spdlog;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 
@@ -16,7 +22,7 @@ private_command_factory::map_type* private_command_factory::map = nullptr;
 
 static void replace_member(std::string& str, const std::string& param, const dpp::user& user, const dpp::guild_member& member)
 {
-    const auto& effective_name = member.nickname.empty() ? user.global_name : member.nickname;
+    const auto& effective_name = member.get_nickname().empty() ? user.global_name : member.get_nickname();
     utils::replaceAll(str, "$"+param+".id", user.id.str());
     utils::replaceAll(str, "$"+param+".name", user.format_username());
     utils::replaceAll(str, "$"+param+".displayname", effective_name);

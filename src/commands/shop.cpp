@@ -1,13 +1,17 @@
-#include "command.hpp"
-#include "branding.hpp"
-#include "database.hpp"
-#include "i18n.hpp"
-#include "utils.hpp"
-
-#include <dpp/coro.h>
-#include <pqxx/pqxx>
+#include <iostream>
+#include <string>
+#include <coroutine>
 
 #include <unordered_map>
+#include <algorithm>
+
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.database;
+import chocobot.utils;
+import pqxx;
+import dpp;
 
 namespace chocobot {
 
@@ -102,7 +106,7 @@ class shop_command : public command
 
                 auto role = res.front().front().as<dpp::snowflake>();
                 auto member = (co_await discord.co_guild_get_member(guild.id, user_id)).get<dpp::guild_member>();
-                if(std::find(member.roles.begin(), member.roles.end(), role) != member.roles.end()) {
+                if(const auto& roles = member.get_roles(); std::find(roles.begin(), roles.end(), role) != roles.end()) {
                     event.reply(utils::build_error(txn, guild, "command.shop.error.activate.dup"));
                     co_return command::result::user_error;
                 }
@@ -134,7 +138,7 @@ class shop_command : public command
 
                 auto role = res.front().front().as<dpp::snowflake>();
                 auto member = (co_await discord.co_guild_get_member(guild.id, user_id)).get<dpp::guild_member>();
-                if(std::find(member.roles.begin(), member.roles.end(), role) == member.roles.end()) {
+                if(const auto& roles = member.get_roles(); std::find(roles.begin(), roles.end(), role) == roles.end()) {
                     event.reply(utils::build_error(txn, guild, "command.shop.error.deactivate.dup"));
                     co_return command::result::user_error;
                 }

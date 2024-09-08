@@ -5,11 +5,11 @@ project(chocobotpp)
 include(FetchContent)
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
-  GIT_TAG        v10.0.26
+  GIT_TAG        v10.0.30
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
-  GIT_TAG        7.7.4
+  GIT_TAG        7.9.2
 )
 FetchContent_Declare(date
   GIT_REPOSITORY https://github.com/HowardHinnant/date.git
@@ -17,11 +17,11 @@ FetchContent_Declare(date
 )
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.1.0
+  GIT_TAG        v3.7.0
 )
 FetchContent_Declare(cmake_git_version_tracking
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
-  GIT_TAG 7d9442bfade5a47b77291e4117f81cc65887c7b9
+  GIT_TAG 6c0cb87edd029ddfb403a8e24577c144a03605a6
 )
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_Declare(pistache
@@ -39,6 +39,7 @@ endif(NOT BUILD_TEST)
 set(DPP_CORO ON CACHE BOOL "DPP: Experimental support for C++20 coroutines" FORCE)
 set(BUILD_VOICE_SUPPORT OFF CACHE BOOL "DPP: Build voice support" FORCE)
 set(RUN_LDCONFIG OFF CACHE BOOL "DPP: Run ldconfig after installation" FORCE)
+set(PISTACHE_BUILD_TESTS OFF CACHE BOOL "Pistache: Build tests" FORCE)
 
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
@@ -66,45 +67,70 @@ endif(USE_INSTALLED_PQXX)
 find_package(spdlog REQUIRED)
 find_package(ImageMagick COMPONENTS Magick++ MagickCore REQUIRED)
 
-set(SOURCES main.cpp
-            src/api.cpp
-            src/database.cpp
-            src/chocobot.cpp
-            src/i18n.cpp
-            src/utils.cpp
-            src/paid_command.cpp
-            src/commands/ping.cpp
-            src/commands/coins.cpp
-            src/commands/ship.cpp
-            src/commands/daily.cpp
-            src/commands/remind.cpp
-            src/commands/gift.cpp
-            src/commands/noop.cpp
-            src/commands/random.cpp
-            src/commands/credits.cpp
-            src/commands/bugreport.cpp
-            src/commands/help.cpp
-            src/commands/mystats.cpp
-            src/commands/shop.cpp
-            src/commands/fortune.cpp
-            src/commands/magick.cpp
-            src/commands/merry_christmas.cpp
-            src/commands/christmas.cpp
-            src/commands/purge.cpp
-            src/games/slot-machine.cpp
-            src/games/who-is-it.cpp
-            src/games/quiz.cpp)
-set(HEADERS "include/chocobot.hpp"
-            "include/database.hpp"
-            "include/api.hpp"
-            "include/command.hpp"
-            "include/games.hpp"
-            "include/i18n.hpp"
-            "include/utils.hpp"
-            "include/branding.hpp"
-            "include/config.hpp")
+set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+add_library(spdlogModule STATIC)
+target_sources(spdlogModule PUBLIC FILE_SET CXX_MODULES FILES third_party/spdlog.cppm)
+target_compile_features(spdlogModule PUBLIC cxx_std_23)
+target_link_libraries(spdlogModule PUBLIC spdlog::spdlog)
+
+add_library(pistacheModule STATIC)
+target_sources(pistacheModule PUBLIC FILE_SET CXX_MODULES FILES third_party/pistache.cppm)
+target_compile_features(pistacheModule PUBLIC cxx_std_23)
+target_link_libraries(pistacheModule PUBLIC pistache)
+
+add_library(pqxxModule STATIC)
+target_sources(pqxxModule PUBLIC FILE_SET CXX_MODULES FILES third_party/pqxx.cppm)
+target_compile_features(pqxxModule PUBLIC cxx_std_23)
+target_link_libraries(pqxxModule PUBLIC libpqxx::pqxx)
+
+add_library(dppModule STATIC)
+target_sources(dppModule PUBLIC FILE_SET CXX_MODULES FILES third_party/dpp.cppm)
+target_compile_features(dppModule PUBLIC cxx_std_23)
+target_link_libraries(dppModule PUBLIC dpp::dpp)
+
+set(SOURCES
+  main.cpp
+  src/api.cpp
+  src/database.cpp
+  src/chocobot.cpp
+  src/utils.cpp
+  src/paid_command.cpp
+  src/commands/ping.cpp
+  src/commands/coins.cpp
+  src/commands/ship.cpp
+  src/commands/daily.cpp
+  src/commands/remind.cpp
+  src/commands/gift.cpp
+  src/commands/noop.cpp
+  src/commands/random.cpp
+  src/commands/credits.cpp
+  src/commands/bugreport.cpp
+  src/commands/help.cpp
+  src/commands/mystats.cpp
+  src/commands/shop.cpp
+  src/commands/fortune.cpp
+  src/commands/magick.cpp
+  src/commands/merry_christmas.cpp
+  src/commands/christmas.cpp
+  src/commands/purge.cpp
+  src/games/slot-machine.cpp
+  src/games/who-is-it.cpp
+  src/games/quiz.cpp
+)
+set(MODULE_SOURCES
+  src/chocobot.cppm
+  src/branding.cppm
+  src/config.cppm
+  src/database.cppm
+  src/i18n.cppm
+  src/utils.cppm
+)
 add_executable(chocobot ${SOURCES})
-#target_precompile_headers(chocobot PRIVATE ${HEADERS})
+target_sources(chocobot PUBLIC
+  FILE_SET CXX_MODULES
+  BASE_DIRS src
+  FILES ${MODULE_SOURCES}
+)
 
 target_include_directories(chocobot PUBLIC include/)
 
@@ -112,11 +138,11 @@ target_include_directories(chocobot PUBLIC
   ${ImageMagick_INCLUDE_DIRS}
 )
 target_link_libraries(chocobot PUBLIC
-  dpp::dpp libpqxx::pqxx spdlog::spdlog
+  dppModule pqxxModule spdlogModule pistacheModule
   ${ImageMagick_LIBRARIES}
   date::date date::date-tz
   cmake_git_version_tracking
-  ssl pistache
+  ssl
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )
@@ -140,9 +166,3 @@ install(DIRECTORY resources DESTINATION share/chocobot)
 if(BUILD_TEST)
   add_subdirectory(test)
 endif(BUILD_TEST)
-
-set(CMAKE_CXX_SCAN_FOR_MODULES ON)
-add_executable(modules_test srcm/main.cpp)
-target_compile_features(modules_test PRIVATE cxx_std_23)
-target_sources(modules_test PRIVATE FILE_SET CXX_MODULES FILES srcm/config.cppm srcm/branding.cppm srcm/utils.cppm srcm/i18n.cppm srcm/database.cppm)
-target_link_libraries(modules_test PRIVATE dpp::dpp libpqxx::pqxx ssl spdlog::spdlog)

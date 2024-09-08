@@ -1,17 +1,18 @@
 #pragma once
 
-#include "database.hpp"
-#include "branding.hpp"
-#include "i18n.hpp"
-#include "command.hpp"
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.database;
+import spdlog;
 
 #include <condition_variable>
 #include <functional>
 #include <mutex>
 #include <vector>
 #include <chrono>
+#include <map>
 #include <experimental/type_traits>
-#include <spdlog/spdlog.h>
 
 #ifdef __unix__
 #include <pthread.h>

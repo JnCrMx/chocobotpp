@@ -8,10 +8,10 @@ module;
 #include <set>
 #include <condition_variable>
 
-#include <dpp/snowflake.h>
-#include <pqxx/pqxx>
-
 export module chocobot.database;
+
+import pqxx;
+import dpp;
 
 export namespace pqxx
 {

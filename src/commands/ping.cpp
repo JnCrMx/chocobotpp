@@ -1,4 +1,8 @@
-#include "command.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
+
+import chocobot;
 
 namespace chocobot {
 

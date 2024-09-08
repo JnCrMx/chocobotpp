@@ -14,7 +14,7 @@ TEST_CASE( "ship command", "[command][ship]" ) {
     SECTION( "general ship tests ") {
         std::string word1 = GENERATE("schaf", "kuh", "schwein", "fisch", "ziege");
         std::string word2 = GENERATE("baum", "blatt", "grass", "teich", "wiese");
-        
+
         SECTION( "shipping a word with itself yields 0%" ) {
             REQUIRE(chocobot::ship_command::ship(word1, word1) == 0);
             REQUIRE(chocobot::ship_command::ship(word2, word2) == 0);

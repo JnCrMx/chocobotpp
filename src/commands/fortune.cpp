@@ -1,11 +1,13 @@
-#include "paid_command.hpp"
-
-#include "chocobot.hpp"
-#include "i18n.hpp"
-
+#include <iostream>
+#include <string>
+#include <coroutine>
 #include <fstream>
 #include <filesystem>
 #include <random>
+#include <algorithm>
+
+import chocobot;
+import chocobot.i18n;
 
 namespace chocobot {
 

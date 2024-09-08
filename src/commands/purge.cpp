@@ -1,8 +1,12 @@
-#include "branding.hpp"
-#include "command.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
+#include <vector>
 
-#include "i18n.hpp"
-#include "utils.hpp"
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 

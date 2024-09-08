@@ -1,8 +1,12 @@
-#include "command.hpp"
-#include "chocobot.hpp"
-#include "i18n.hpp"
-#include "branding.hpp"
-#include "utils.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
+#include <optional>
+
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 
@@ -42,7 +46,7 @@ class gift_command : public command
 			auto recv = (co_await discord.co_user_get_cached(recvo.value())).get<dpp::user_identified>();
 			{
 				pqxx::work txn(connection);
-				if(db.get_coins(event.msg.author.id, guild.id, txn) < amount)
+				if(db.get_coins(event.msg.author.id, guild.id, txn).value_or(0) < amount)
 				{
 					event.reply(utils::build_error(txn, guild, "command.gift.error.not_enough"));
 					co_return command::result::user_error;

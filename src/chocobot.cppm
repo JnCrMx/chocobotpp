@@ -1,20 +1,25 @@
-#pragma once
+module;
 
-#include <fmt/format.h>
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
-#include <memory>
-#include <dpp/cluster.h>
-#include <dpp/coro/coroutine.h>
+#include <chrono>
+#include <thread>
+#include <coroutine>
+#include <map>
 
-#include "database.hpp"
+export module chocobot;
+
+export import chocobot.database;
+export import chocobot.config;
+export import dpp;
+export import pqxx;
+export import spdlog;
+
+import pistache;
 
 namespace chocobot {
 
-class chocobot;
+export class chocobot;
 
-class command
+export class command
 {
     public:
         enum class result
@@ -63,7 +68,7 @@ class command
         virtual ~command() {}
 };
 
-struct command_factory
+export struct command_factory
 {
     using map_type = std::map<std::string, std::unique_ptr<command>>;
 
@@ -81,7 +86,7 @@ struct command_factory
    		static map_type * map;
 };
 
-template<typename T>
+export template<typename T>
 struct command_register : command_factory
 {
     command_register(T* command)
@@ -96,7 +101,7 @@ struct command_register : command_factory
     command_register(Args&&... args) : command_register(new T(std::forward(args...))) {}
 };
 
-struct private_command_factory
+export struct private_command_factory
 {
     using map_type = std::map<std::string, std::unique_ptr<command>>;
 
@@ -114,7 +119,7 @@ struct private_command_factory
    		static map_type * map;
 };
 
-template<typename T>
+export template<typename T>
 struct private_command_register : private_command_factory
 {
     private_command_register(T* command)
@@ -127,6 +132,13 @@ struct private_command_register : private_command_factory
 
     template<typename... Args>
     private_command_register(Args&&... args) : private_command_register(new T(std::forward(args...))) {}
+};
+
+export class paid_command : public command {
+    public:
+        virtual dpp::coroutine<bool> preflight(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&) override;
+        virtual dpp::coroutine<> postexecute(chocobot&, pqxx::connection&, database&, dpp::cluster&, const guild&, const dpp::message_create_t&, std::istream&, result) override;
+        virtual int get_cost() = 0;
 };
 
 };
@@ -147,3 +159,82 @@ template<> struct fmt::formatter<chocobot::command::result> : formatter<std::str
         return formatter<string_view>::format(s, ctx);
     }
 };
+
+namespace chocobot {
+
+export class api {
+    public:
+        api(const config& config, database& db, chocobot* chocobot);
+
+        void prepare();
+
+        void start();
+        void stop();
+
+        constexpr static auto API_PREFIX = "/api/v1";
+    private:
+        void setupRoutes();
+
+        void healthz(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+        void token_check(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+        void token_guilds(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+        void guild_info(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+        void get_self_user(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+        void save_streaks(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+
+        std::string m_address;
+        int m_port;
+        dpp::snowflake m_owner;
+        config::cors_config m_cors_config;
+
+        Pistache::Http::Endpoint m_endpoint;
+        Pistache::Rest::Router m_router;
+
+        chocobot* m_chocobot;
+        dpp::cluster& m_cluster;
+        database& m_db;
+        struct {
+            std::string check_token;
+            std::string save_streaks;
+        } m_prepared_commands;
+};
+
+export class chocobot
+{
+    public:
+        chocobot(config config) : m_config(config), m_db(config.db_uri),
+            m_bot(config.token, dpp::i_default_intents | dpp::i_message_content, /*token, intents*/
+                  0, 0, 1, true,  /*shards, cluster_id, maxclusters, compressed*/
+                  {dpp::cp_aggressive, dpp::cp_none, dpp::cp_none}, /*policy*/
+                  4, 1) /*request_threads, request_threads_raw*/,
+            m_api(m_config, m_db, this)
+        {
+            init();
+        }
+        ~chocobot() = default;
+
+        void start();
+        void stop();
+
+        const config& cfg() { return m_config; }
+    private:
+        void init();
+
+        void check_reminds();
+
+        friend api;
+
+        config m_config;
+        dpp::cluster m_bot;
+        database m_db;
+
+        std::jthread remind_thread;
+        struct {
+            std::string list;
+            std::string done;
+        } remind_queries{};
+
+        api m_api;
+};
+
+}

@@ -1,11 +1,16 @@
-#include "command.hpp"
-#include "utils.hpp"
-
-#include <dpp/colors.h>
+#include <iostream>
+#include <string>
+#include <coroutine>
 
 #include <limits>
 #include <locale>
 #include <algorithm>
+#include <iomanip>
+
+import dpp;
+import chocobot;
+import chocobot.branding;
+import chocobot.utils;
 
 namespace chocobot {
 
@@ -36,7 +41,7 @@ class ship_command : public command
 
             dpp::embed embed{};
             embed.set_title(utils::solve_mentions(word1)+" x "+utils::solve_mentions(word2));
-            embed.set_color(dpp::colors::magenta);
+            embed.set_color(branding::colors::love);
 
             int percent = ship(word1, word2);
 

@@ -1,11 +1,12 @@
 #include <fstream>
-#include <spdlog/spdlog.h>
-#include <spdlog/cfg/env.h>
+#include <iostream>
+#include <signal.h>
 #include <Magick++.h>
 
-#include "config.hpp"
-#include "chocobot.hpp"
-#include "utils.hpp"
+import spdlog;
+import chocobot;
+import chocobot.utils;
+import chocobot.config;
 
 static int g_exiting = 0;
 static chocobot::chocobot* g_bot;

@@ -1,9 +1,11 @@
-#include "games.hpp"
-
-#include "utils.hpp"
-
 #include <Magick++.h>
 #include <random>
+#include <future>
+
+#include "games.hpp"
+
+import chocobot;
+import chocobot.utils;
 
 namespace chocobot {
 
@@ -53,7 +55,7 @@ class who_is_it : public multi_player_game
 
 #if MagickLibInterface == 10
                 using MagickFilterType = Magick::FilterType;
-#elif MagickLibInterface == 6
+#elif MagickLibInterface == 6 || MagickLibInterface == 7
                 using MagickFilterType = Magick::FilterTypes;
 #endif
 
@@ -200,7 +202,7 @@ class who_is_it : public multi_player_game
                 std::string text = event.msg.content;
                 if(text == m_target_user.username || text == m_target_user.format_username() ||
                    text == std::to_string(m_target_user.id) ||
-                   (!m_target_member.nickname.empty() && text == m_target_member.nickname))
+                   (!m_target_member.get_nickname().empty() && text == m_target_member.get_nickname()))
                 {
                     m_discord.message_add_reaction(event.msg, "✅");
 

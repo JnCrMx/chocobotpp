@@ -1,13 +1,17 @@
-#include "command.hpp"
-#include "utils.hpp"
-#include "chocobot.hpp"
-#include "i18n.hpp"
-#include "branding.hpp"
+#include <iostream>
+#include <string>
+#include <coroutine>
+#include <thread>
 
 #ifdef __unix__
 #include <ext/stdio_filebuf.h>
 #include <sys/wait.h>
 #endif
+
+import chocobot;
+import chocobot.branding;
+import chocobot.i18n;
+import chocobot.utils;
 
 namespace chocobot {
 

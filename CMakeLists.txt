@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(chocobotpp)
+project(chocobotpp LANGUAGES CXX VERSION 1.0.0 DESCRIPTION "A simple Discord Bot")
 
 include(FetchContent)
 FetchContent_Declare(DPP
@@ -87,6 +87,11 @@ add_library(dppModule STATIC)
 target_sources(dppModule PUBLIC FILE_SET CXX_MODULES FILES third_party/dpp.cppm)
 target_compile_features(dppModule PUBLIC cxx_std_23)
 target_link_libraries(dppModule PUBLIC dpp::dpp)
+if(USE_INSTALLED_DPP) # DPP doesn't properly export include directories nor libraries
+  target_include_directories(dppModule PUBLIC ${dpp_DIR}/../../../include)
+  target_link_libraries(dppModule PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(dppModule PUBLIC crypto ssl)
+endif(USE_INSTALLED_DPP)
 
 set(SOURCES
   main.cpp
@@ -146,12 +151,6 @@ target_link_libraries(chocobot PUBLIC
 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_QUANTUM_DEPTH=16 )
 target_compile_definitions(chocobot PUBLIC -DMAGICKCORE_HDRI_ENABLE=0 )
-
-if(USE_INSTALLED_DPP) # DPP doesn't properly export include directories nor libraries
-  target_include_directories(chocobot PUBLIC ${dpp_DIR}/../../../include)
-  target_link_libraries(chocobot PUBLIC nlohmann_json::nlohmann_json)
-  target_link_libraries(chocobot PUBLIC crypto ssl)
-endif(USE_INSTALLED_DPP)
 
 target_compile_features(chocobot PUBLIC cxx_std_23)
 

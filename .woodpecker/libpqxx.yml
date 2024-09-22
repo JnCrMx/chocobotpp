@@ -2,7 +2,7 @@ steps:
   build:
     image: ubuntu:noble
     commands:
-      - ./scripts/build_libpqxx.sh
+      - PARALLEL=1 ./scripts/build_libpqxx.sh
       - mkdir ./upload
       - cp /out/libpqxx-*.tar.gz ./upload
   upload:

@@ -19,7 +19,7 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_SHARED_LIBS=OFF -DDPP_BUILD_TEST=OFF -DDPP_CORO=ON \
     -S/src -B/build -G Ninja
 
-cmake --build /build --config RelWithDebInfo --target all --parallel $(nproc) --
+cmake --build /build --config RelWithDebInfo --target all --parallel ${PARALLEL:-$(nproc)} --
 cmake --install /build --prefix "/install"
 
 tar -C /install -cavf /out/dpp-${DPP_VERSION}-$(arch).tar.gz .

@@ -2,7 +2,7 @@ steps:
   build:
     image: ubuntu:noble
     commands:
-      - ./scripts/build_dpp.sh
+      - PARALLEL=1 ./scripts/build_dpp.sh
       - mkdir ./upload
       - cp /out/dpp-*.tar.gz ./upload
   upload:

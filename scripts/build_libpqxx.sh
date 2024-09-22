@@ -11,7 +11,7 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     tar \
     xz-utils
 
-PQXX_VERSION=7.7.5
+PQXX_VERSION="7.9.2"
 
 git clone https://github.com/jtv/libpqxx.git -b ${PQXX_VERSION} /src
 

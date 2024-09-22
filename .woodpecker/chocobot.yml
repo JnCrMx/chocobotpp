@@ -20,3 +20,6 @@ steps:
             cpu: 2500m
         nodeSelector:
           jcm.re/ci-type: big
+
+when:
+  - evaluate: 'SKIP_MAIN != "true"'

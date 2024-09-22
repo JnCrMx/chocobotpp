@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UBUNTU_VERSION=mantic
+UBUNTU_VERSION=noble
 COMPONENT=$1
 ARCH=$2
 

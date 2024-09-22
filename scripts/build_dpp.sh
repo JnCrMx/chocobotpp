@@ -11,7 +11,7 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     xz-utils \
     zlib1g-dev
 
-DPP_VERSION="v10.0.26"
+DPP_VERSION="v10.0.30"
 
 git clone https://github.com/brainboxdotcc/DPP.git -b ${DPP_VERSION} /src
 

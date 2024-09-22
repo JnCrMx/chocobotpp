@@ -1,0 +1,24 @@
+steps:
+  build:
+    image: ubuntu:noble
+    commands:
+      - ./scripts/build_libpqxx.sh
+      - mkdir ./upload
+      - cp /out/libpqxx-*.tar.gz ./upload
+  upload:
+    image: appleboy/drone-scp
+    settings:
+      host:
+        from_secret: ssh_host
+      username:
+        from_secret: ssh_user
+      key:
+        from_secret: ssh_key
+      port:
+        from_secret: ssh_port
+      target: /config/data/files/
+      source: upload/
+      strip_components: 1
+when:
+  - event: manual
+    evaluate: '(BUILD_LIBPQXX ?? "false") == "true"'

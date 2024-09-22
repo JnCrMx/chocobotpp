@@ -13,11 +13,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
-#ARG DPP_VERSION=v10.0.30
-#ARG PQXX_VERSION=7.9.2
+ARG DPP_VERSION=v10.0.30
+ARG PQXX_VERSION=7.9.2
 
-#RUN mkdir -p /third_party/dpp/install && curl https://files.jcm.re/dpp-${DPP_VERSION}-$(arch).tar.gz | tar -C /third_party/dpp/install -xz
-#RUN mkdir -p /third_party/pqxx/install && curl https://files.jcm.re/libpqxx-${PQXX_VERSION}-$(arch).tar.gz | tar -C /third_party/pqxx/install -xz
+RUN mkdir -p /third_party/dpp/install && curl https://files.jcm.re/dpp-${DPP_VERSION}-$(arch).tar.gz | tar -C /third_party/dpp/install -xz
+RUN mkdir -p /third_party/pqxx/install && curl https://files.jcm.re/libpqxx-${PQXX_VERSION}-$(arch).tar.gz | tar -C /third_party/pqxx/install -xz
 
 COPY . /src
 RUN mkdir -p /build && \

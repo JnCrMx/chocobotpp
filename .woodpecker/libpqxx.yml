@@ -2,9 +2,9 @@ steps:
   build:
     image: ubuntu:noble
     commands:
-      - PARALLEL=1 ./scripts/build_libpqxx.sh
       - mkdir ./upload
-      - cp /out/libpqxx-*.tar.gz ./upload
+      - ln -s $PWD/upload /out
+      - PARALLEL=2 ./scripts/build_libpqxx.sh
   upload:
     image: appleboy/drone-scp
     settings:

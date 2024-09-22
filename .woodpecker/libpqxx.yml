@@ -5,6 +5,7 @@ steps:
       - mkdir ./upload
       - ln -s $PWD/upload /out
       - PARALLEL=2 ./scripts/build_libpqxx.sh
+      - ls -lh ./upload
   upload:
     image: appleboy/drone-scp
     settings:

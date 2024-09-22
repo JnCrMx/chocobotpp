@@ -23,7 +23,7 @@ COPY . /src
 RUN mkdir -p /build && \
     /usr/bin/cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="-O2" \
     -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
-    #-DUSE_INSTALLED_DPP=ON -DUSE_INSTALLED_PQXX=ON \
+    -DUSE_INSTALLED_DPP=ON -DUSE_INSTALLED_PQXX=ON \
     -DCMAKE_SYSTEM_PREFIX_PATH="/third_party/dpp/install;/third_party/pqxx/install" \
     -S/src -B/build -G Ninja
 RUN /usr/bin/cmake --build /build --config RelWithDebInfo --target all --parallel $(($(nproc) / 2)) --

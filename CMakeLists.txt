@@ -3,30 +3,52 @@ cmake_minimum_required(VERSION 3.10)
 project(chocobotpp LANGUAGES CXX VERSION 1.0.0 DESCRIPTION "A simple Discord Bot")
 
 include(FetchContent)
+
+function(FetchContent_MakeAvailable_ExcludeFromAll)
+  if(CMAKE_VERSION VERSION_LESS "3.28.0")
+    foreach(_name ${ARGN})
+        FetchContent_GetProperties(${_name})
+        if(NOT ${_name}_POPULATED)
+            FetchContent_Populate(${_name})
+            add_subdirectory(${${_name}_SOURCE_DIR} ${${_name}_BINARY_DIR} EXCLUDE_FROM_ALL)
+        endif()
+    endforeach()
+  else()
+    FetchContent_MakeAvailable(${ARGN})
+  endif()
+endfunction()
+
 FetchContent_Declare(DPP
   GIT_REPOSITORY https://github.com/brainboxdotcc/DPP.git
   GIT_TAG        v10.0.30
+  EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(pqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
   GIT_TAG        7.9.2
+  EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(date
   GIT_REPOSITORY https://github.com/HowardHinnant/date.git
   GIT_TAG        v3.0.1
+  EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.7.0
+  EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(cmake_git_version_tracking
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
   GIT_TAG 6c0cb87edd029ddfb403a8e24577c144a03605a6
+  EXCLUDE_FROM_ALL
 )
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz EXCLUDE_FROM_ALL)
 FetchContent_Declare(pistache
   GIT_REPOSITORY https://github.com/pistacheio/pistache.git
-  GIT_TAG        master)
+  GIT_TAG        master
+  EXCLUDE_FROM_ALL
+)
 
 set(BUILD_TZ_LIB ON CACHE BOOL "date: build/install of TZ library" FORCE)
 set(USE_SYSTEM_TZ_DB ON CACHE BOOL "date: Use the operating system's timezone database" FORCE)
@@ -44,23 +66,23 @@ set(PISTACHE_BUILD_TESTS OFF CACHE BOOL "Pistache: Build tests" FORCE)
 option(USE_INSTALLED_DPP "Use preinstalled DPP" OFF)
 option(USE_INSTALLED_PQXX "Use preinstalled pxqq" OFF)
 
-FetchContent_MakeAvailable(date cmake_git_version_tracking pistache)
+FetchContent_MakeAvailable_ExcludeFromAll(date cmake_git_version_tracking pistache)
 if(BUILD_TEST)
-  FetchContent_MakeAvailable(Catch2)
+  FetchContent_MakeAvailable_ExcludeFromAll(Catch2)
 endif(BUILD_TEST)
 
 if(USE_INSTALLED_DPP)
   find_package(dpp REQUIRED)
-  FetchContent_MakeAvailable(json)
+  FetchContent_MakeAvailable_ExcludeFromAll(json)
 else()
-  FetchContent_MakeAvailable(DPP)
+  FetchContent_MakeAvailable_ExcludeFromAll(DPP)
   add_library(dpp::dpp ALIAS dpp)
 endif(USE_INSTALLED_DPP)
 
 if(USE_INSTALLED_PQXX)
   find_package(libpqxx REQUIRED)
 else()
-  FetchContent_MakeAvailable(pqxx)
+  FetchContent_MakeAvailable_ExcludeFromAll(pqxx)
   add_library(libpqxx::pqxx ALIAS pqxx)
 endif(USE_INSTALLED_PQXX)
 
@@ -159,7 +181,7 @@ add_custom_target(copy_assets
 )
 add_dependencies(chocobot copy_assets)
 
-install(TARGETS chocobot DESTINATION bin)
+install(TARGETS chocobot)
 install(DIRECTORY resources DESTINATION share/chocobot)
 
 if(BUILD_TEST)

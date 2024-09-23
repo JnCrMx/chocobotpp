@@ -177,7 +177,7 @@ void chocobot::init()
     remind_queries.done = m_db.prepare("remind_done", "UPDATE reminders SET done = true WHERE id = $1");
     remind_thread = std::jthread([this](std::stop_token stop_token){
         using namespace std::literals::chrono_literals;
-        std::this_thread::sleep_for(10s);
+        std::this_thread::sleep_for(60s);
 
         std::mutex mutex;
 		std::unique_lock<std::mutex> lock(mutex);
@@ -251,12 +251,17 @@ void chocobot::check_reminds()
         dpp::message msg{channel_id, bot_message};
         /*if(bot_message.find(user->get_mention()) != std::string::npos)
             msg.set_allowed_mentions(true, false, false, false, {uid}, {});*/
-        m_bot.message_create_sync(msg);
 
-        spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);
+        try {
+            m_bot.message_create_sync(msg);
 
-        txn.exec_prepared0(remind_queries.done, id);
-        txn.commit();
+            spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);
+
+            txn.exec_prepared0(remind_queries.done, id);
+            txn.commit();
+        } catch(const std::exception& ex) {
+            spdlog::error("Failed to send remind {} for {} from {} at {}: {}", id, user.format_username(), issuer.format_username(), time, ex.what());
+        }
     }
 }
 

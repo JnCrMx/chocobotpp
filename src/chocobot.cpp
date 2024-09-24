@@ -260,7 +260,19 @@ void chocobot::check_reminds()
             txn.exec_prepared0(remind_queries.done, id);
             txn.commit();
         } catch(const std::exception& ex) {
-            spdlog::error("Failed to send remind {} for {} from {} at {}: {}", id, user.format_username(), issuer.format_username(), time, ex.what());
+            msg.channel_id = guild.remind_channel;
+            spdlog::warn("Failed to send remind in channel {}, we will try to send it in the remind channel {}", channel_id, msg.channel_id);
+            try {
+                m_bot.message_create_sync(msg);
+
+                spdlog::debug("Completed remind {} for {} from {} at {}", id, user.format_username(), issuer.format_username(), time);
+
+                txn.exec_prepared0(remind_queries.done, id);
+                txn.commit();
+            }
+            catch(const std::exception& ex) {
+                spdlog::error("Failed to send remind {} for {} from {} at {}: {}", id, user.format_username(), issuer.format_username(), time, ex.what());
+            }
         }
     }
 }

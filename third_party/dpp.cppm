@@ -43,6 +43,7 @@ export namespace dpp {
 
     using dpp::coroutine;
     using dpp::job;
+    using dpp::task;
     using dpp::when_any;
 
     namespace utility {

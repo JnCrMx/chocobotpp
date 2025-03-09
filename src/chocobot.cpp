@@ -89,7 +89,7 @@ void chocobot::init()
         spdlog::info("Prepared private command {}", name);
     }
 
-    m_bot.on_message_create([this](dpp::message_create_t event) -> dpp::job {
+    m_bot.on_message_create([this](dpp::message_create_t event) -> dpp::task<void> {
         if(event.msg.author.is_bot())
             co_return;
         std::istringstream iss(event.msg.content);
